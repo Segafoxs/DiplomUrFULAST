@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends 'hello/example.html' %}
+
+{% block title %}
+    Cоздание наряда-допуск
+
+{% endblock %}
+
+{% block content %}
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+
+            <div class="col-md-4 mb-4 pb-2">
+                <label class="form-label">Наряд-допуск выдал</label>
+                {{ forms.your_name }}
+            </div>
+        </div>
+
+        <input type="submit" value="Send" >
+
+{% endblock %}

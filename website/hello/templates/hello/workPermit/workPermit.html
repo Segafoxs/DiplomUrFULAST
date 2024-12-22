@@ -1,0 +1,328 @@
+{% extends 'hello/example.html' %}
+
+{% block title %}
+    Cоздание наряда-допуск
+
+{% endblock %}
+
+{% block content %}
+
+<h3>Оформление наряда-допуска</h3>
+
+<form id="postDirectorForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4 pb-2">
+            <input type="text" name="search_director" id="searchDirectorInput" class="form-control form-control-lg" placeholder="ФИО">
+            <label class="form-label" for="searchDirectorInput">Наряд-допуск выдал</label>
+        </div>
+        <div class="col-md-4 mb-4 pb-2">
+            <button type="button" class="btn btn-light" onclick="submitPost('postDirectorForm', 'postDirector/')">Отправить</button>
+        </div>
+    </div>
+</form>
+
+<form id="postManagerForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4 pb-2">
+            <input type="text" name="search_manager" id="searchManagerInput" class="form-control form-control-lg" placeholder="ФИО руководителя">
+            <label class="form-label" for="searchManagerInput">Руководитель работ</label>
+        </div>
+        <div class="col-md-4 mb-4 pb-2">
+            <button type="button" class="btn btn-light" onclick="submitPost('postManagerForm', '/workPermit/postManager/')">Отправить</button>
+        </div>
+    </div>
+</form>
+
+<form id="postExecutorForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4 pb-2">
+            <input type="text" name="search_executor" id="searchExecutorInput" class="form-control form-control-lg" placeholder="ФИО исполнителя">
+            <label class="form-label" for="searchExecutorInput">Исполнитель работ</label>
+        </div>
+        <div class="col-md-4 mb-4 pb-2">
+            <button type="button" class="btn btn-light" onclick="submitPost('postExecutorForm', '/workPermit/postExecutor/')">Отправить</button>
+        </div>
+    </div>
+</form>
+
+<form id="postShiftManagerForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4 pb-2">
+            <input type="text" name="search_shiftManager" id="searchShiftManagerInput" class="form-control form-control-lg" placeholder="ФИО начальника смены">
+            <label class="form-label" for="searchShiftManagerInput">Начальник смены</label>
+        </div>
+        <div class="col-md-4 mb-4 pb-2">
+            <button type="button" class="btn btn-light" onclick="submitPost('postShiftManagerForm', '/workPermit/postShiftManager/')">Отправить</button>
+        </div>
+    </div>
+</form>
+
+<form id="postStateEngineerForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 mb-4 pb-2">
+            <input type="text" name="search_state_engineer" id="searchStateEngineerInput" class="form-control form-control-lg" placeholder="ФИО дежурного инженера">
+            <label class="form-label" for="searchStateEngineerInput">Дежурный инженер станции</label>
+        </div>
+        <div class="col-md-4 mb-4 pb-2">
+            <button type="button" class="btn btn-light" onclick="submitPost('postStateEngineerForm', '/workPermit/postStateEngineer/')">Отправить</button>
+        </div>
+    </div>
+</form>
+
+
+<!--        <div class="row">-->
+<!--                    <div class="col-md-2 mb-4 pb-2">-->
+
+<!--                      <div data-mdb-input-init class="form-outline">-->
+<!--                        <input type="text" id="countInp" size="1" maxlength="1"/>-->
+<!--                        <label class="form-label" for="form3Examplev2">Количество членов бригады</label>-->
+<!--                        <form id="myForm">-->
+
+
+<!--                        <input type="submit" id="btnSub"/>-->
+<!--                        </form>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-8 mb-4 pb-2">-->
+
+<!--                      <div class="col-md-9 pe-1">-->
+<!--                          <textarea name="member" class="form-control" rows="3"></textarea>-->
+<!--                          Должность, ФИО, разряд членов бригады-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--            </div>-->
+
+
+  <form method="post" action="resultWorkPermit/" id="workPermitForm">
+    {% csrf_token %}
+    
+    <div class="row align-items-center py-3">
+        <div class="col-md-4 mb-4 pb-2">
+            {{ form_department }}
+        </div>
+    </div>
+
+    <div class="row align-items-center py-3">
+        <div class="col-md-4 mb-4 pb-2">
+            <label for="countMemberInput" class="form-label">Количество членов бригады</label>
+            <input type="number" name="countMember" id="countMemberInput" class="form-control form-control-lg" placeholder="Введите количество" min="1" oninput="generateMemberFields(this.value)" />
+        </div>
+    </div>
+
+    <div class="row" id="memberFieldsContainer">
+    </div>
+
+    <div class="row align-items-center py-3">
+        <div class="col-md-7 pe-5">
+            <label for="workDescription" class="form-label">Название работы</label>
+            <textarea class="form-control" name="work" id="workDescription" rows="3" placeholder="Название работы, район, оборудование, отметка"></textarea>
+        </div>
+    </div>
+
+    <div class="row align-items-center py-3">
+        <div class="col-md-7 pe-5">
+            <fieldset>
+              <legend>Для обеспечения безопасных условий необходимо</legend>
+              <div>
+                <input type="checkbox" id="instagram" name="source" value="Оградить рабочее место сигнальной лентой">
+                <label for="instagram">Оградить рабочее место сигнальной лентой</label>
+              </div>
+              <div>
+                <input type="checkbox" id="facebook" name="source" value="Работать при достаточном освещении">
+                <label for="facebook">Работать при достаточном освещении</label>
+              </div>
+              <div>
+                <input type="checkbox" id="search-engine" name="source" value="Соблюдать осторожность вблизи с работающим оборудованием">
+                <label for="search-engine">Соблюдать осторожность вблизи с работающим оборудованием</label>
+              </div>
+              <div>
+                <input type="checkbox" id="word-of-mouth" name="source" value="Соблюдать требования ОТ и ПБ при работе с эл. инструментом">
+                <label for="word-of-mouth">Соблюдать требования ОТ и ПБ при работе с эл. инструментом</label>
+              </div>
+              <div>
+                <input type="checkbox" id="press" name="source" value="Соблюдать требования при работе с ПС.">
+                <label for="press">Соблюдать требования при работе с ПС.</label>
+              </div>
+              <div>
+                <input type="checkbox" id="event" name="source" value="Работать в исправной спецодежде.">
+                <label for="event">Работать в исправной спецодежде.</label>
+              </div>
+              <div>
+                <input type="checkbox" id="billboard1" name="source" value="По окончании работ убрать рабочее место.">
+                <label for="billboard1">По окончании работ убрать рабочее место.</label>
+              </div>
+              <div>
+                <input type="checkbox" id="billboard2" name="source" value="Применять СИЗ.">
+                <label for="billboard2">Применять СИЗ.</label>
+              </div>
+              <div>
+                <input type="checkbox" id="billboard3" name="source" value="Огневые работы производить по отдельному наряду-допуску.">
+                <label for="billboard3">Огневые работы производить по отдельному наряду-допуску.</label>
+              </div>
+            </fieldset>
+<!--            <select multiple class="form-select" id="safetyRequirements" name="safetyRequirements">-->
+<!--                <option value="Оградить рабочее место сигнальной лентой.">Оградить рабочее место сигнальной лентой.</option>-->
+<!--                <option value="Работать при достаточном освещении.">Работать при достаточном освещении.</option>-->
+<!--                <option value="Соблюдать осторожность вблизи с работающим оборудованием.">Соблюдать осторожность вблизи с работающим оборудованием.</option>-->
+<!--                <option value="Соблюдать требования ОТ и ПБ при работе с эл. инструментом.">Соблюдать требования ОТ и ПБ при работе с эл. инструментом.</option>-->
+<!--                <option value="Соблюдать требования при работе с ПС.">Соблюдать требования при работе с ПС.</option>-->
+<!--                <option value="Не загромождать проходы, проезды, площадки.">Не загромождать проходы, проезды, площадки.</option>-->
+<!--                <option value="Работать в исправной спецодежде.">Работать в исправной спецодежде.</option>-->
+<!--                <option value="Работать исправным инструментом.">Работать исправным инструментом.</option>-->
+<!--                <option value="По окончании работ убрать рабочее место.">По окончании работ убрать рабочее место.</option>-->
+<!--                <option value="Применять СИЗ.">Применять СИЗ.</option>-->
+<!--                <option value="Работать исправным эл. инструментом.">Работать исправным эл. инструментом.</option>-->
+<!--                <option value="Огневые работы производить по отдельному наряду-допуску.">Огневые работы производить по отдельному наряду-допуску.</option>-->
+<!--            </select>-->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="form55Examplev5" class="form-label">Номер наряда</label>
+            <input type="text" name="number_permit" id="form55Examplev5" class="form-control form-control-lg" />
+        </div>
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="dateStart" class="form-label">Дата начала работы</label>
+            <input type="date" name="dateStart" id="dateStart" class="form-control form-control-lg" />
+        </div>
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="timeStart" class="form-label">Время начала работы</label>
+            <input type="time" name="timeStart" id="timeStart" class="form-control form-control-lg" />
+        </div>
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="dateEnd" class="form-label">Дата окончания</label>
+            <input type="date" name="dateEnd" id="dateEnd" class="form-control form-control-lg" />
+        </div>
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="timeEnd" class="form-label">Время окончания</label>
+            <input type="time" name="timeEnd" id="timeEnd" class="form-control form-control-lg" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4 pb-2">
+            <label for="conditions" class="form-label">Особые условия</label>
+            <input type="text" name="conditions" id="conditions" class="form-control form-control-lg" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="dateDelivery" class="form-label">Дата выдачи наряда</label>
+            <input type="date" name="dateDelivery" id="dateDelivery" class="form-control form-control-lg" />
+        </div>
+        <div class="col-md-3 mb-4 pb-2">
+            <label for="timeDelivery" class="form-label">Время выдачи наряда</label>
+            <input type="time" name="timeDelivery" id="timeDelivery" class="form-control form-control-lg" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Сформировать наряд-допуск</button>
+        </div>
+    </div>
+</form>
+
+
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="resultModalLabel">Результат</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+              <!-- Здесь будет отображён результат -->
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          </div>
+      </div>
+  </div>
+</div>
+  
+<script>
+async function submitPost(formId, url) {
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+    const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    for (const [key, value] of formData.entries()) {
+        if (!value.trim()) {
+            const modalBody = document.querySelector("#resultModal .modal-body");
+            modalBody.innerHTML = `<p class="text-danger">Поле "${key}" не может быть пустым.</p>`;
+            const resultModal = new bootstrap.Modal(document.getElementById("resultModal"));
+            resultModal.show();
+            return;
+        }
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+
+        const modalBody = document.querySelector("#resultModal .modal-body");
+        if (response.ok) {
+            modalBody.innerHTML = `<p>${result.success}</p>`;
+        } else {
+            modalBody.innerHTML = `<p class="text-danger">${result.error}</p>`;
+        }
+
+        const resultModal = new bootstrap.Modal(document.getElementById("resultModal"));
+        resultModal.show();
+    } catch (error) {
+        console.error("Ошибка запроса:", error);
+    }
+}
+function generateMemberFields(count) {
+    const container = document.getElementById("memberFieldsContainer");
+    container.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+        const row = document.createElement("div");
+        row.className = "col-md-4 mb-4 pb-2";
+        row.innerHTML = `
+            <div data-mdb-input-init class="form-outline">
+                <input type="text" name="members[${i}]" id="member_${i}" class="form-control form-control-lg" placeholder="ФИО члена бригады" required />
+                <label class="form-label" for="member_${i}">Член бригады ${i + 1}</label>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+}
+</script>
+
+
+<!--        <p>Руководителю работ: <input type="text" name="managerPost" placeholder="должность">  <input type="text" name="manager" placeholder="ФИО"></p>-->
+<!--        <p>Производителю работ: <input type="text" name="executorPost" placeholder="должность">  <input type="text" name="executor" placeholder="ФИО"></p>-->
+<!--        <p>С членами бригады: <input type="text" name="countMember" placeholder="Количество членов бригады"> Члены бригады: <input type="text" name="member" placeholder="ФИО, разряд"></p>-->
+<!--        <p>Поручается выполнить: </p>-->
+<!--        <textarea name="work" id="workId" cols="50" rows="2"></textarea>-->
+
+<!--        <p>Начало работы: дата  <input type="date" name="dateStart" placeholder="Дата начала работы">  <input type="time" name="timeStart" placeholder="Дата начала работы">,-->
+<!--            Окончание: <input type="date" name="dateEnd" placeholder="время">  <input type="time" name="timeEnd" placeholder="время"></p>-->
+<!--&lt;!&ndash;        <p>Для обеспечения безопасных условий необходимо:</p>&ndash;&gt;-->
+<!--&lt;!&ndash;        <textarea name="safeComment" id="safeId" cols="50" rows="2"></textarea>&ndash;&gt;-->
+<!--        <p>Особые условия: <input type="text" name="conditions" placeholder="Особые условия"></p>-->
+<!--        <p>Наряд выдал: дата <input type="text" name="dateStart" placeholder="Дата">, должность <input type="text" name="directorPost" placeholder="Должность">  <input type="text" name="director" placeholder="ФИО"></p>-->
+<!--        <p>Дежурный персонал других цехов (участков) <input type="text" name="personalPost" placeholder="Должность">  <input type="text" name="personal" placeholder="ФИО"></p>-->
+
+
+
+<!--        <a href="{% url 'resultPermit' %}">Далее</a>-->
+
+
+{% endblock %}

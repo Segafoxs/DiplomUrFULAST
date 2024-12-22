@@ -1,0 +1,20 @@
+{% extends 'hello/example.html' %}
+{% load render_table from django_tables2 %}
+
+{% block title %}
+    Текущие наряды-допуски
+{% endblock %}
+
+{% block content %}
+    <h1>Текущие наряды-допуски</h1>
+
+    <div>
+        <br>
+        <form action="" method="GET">
+            {{ filterset_class.form }}
+            <button type="submit">Filter</button>
+        </form>
+        <br>
+        {% render_table table %}
+    </div>
+{% endblock %}
