@@ -17,4 +17,34 @@
         <br>
         {% render_table table %}
     </div>
+
+
+
+
+<div class="modal fade" id="PermitModal" tabindex="-1" aria-labelledby="viewPermitModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPermitModal">Просмотр наряда</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form method="post" action="{% url 'view_permit' %}">
+                {% csrf_token %}
+
+
+                <div class="modal-body">
+                    <div class="mb-3">
+
+
+                        <div class="mb-3">
+                            <label for="number" class="form-label">Введите номер наряда</label>
+                            <input type="text" class="form-control" id="number" name="number" required>
+                        </div>
+                        <button type="submit">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

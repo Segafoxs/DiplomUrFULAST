@@ -6,4 +6,4 @@ class MyFilter(django_filters.FilterSet):
 
     class Meta:
         model = Permit
-        fields = {'status': ["contains"]}
+        fields = {'number': ["contains"]}

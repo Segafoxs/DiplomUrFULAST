@@ -1,0 +1,20 @@
+{% extends 'hello/example.html' %}
+
+{% block title %}
+    Cоздание наряда-допуск
+
+
+{% endblock %}
+{% block content %}
+    {% for n in permit %}
+    <h4>Номер наряда: {{ n.number }}</h4>
+    <h4>Статус: {{ n.status }}</h4>
+    <h4>Руководитель работ: {{ n.master_of_work }}</h4>
+    <h4>Работа: {{ n.work_description }}</h4>
+    <h4>Начало работы: {{ n.start_of_work }} Окончание работы {{ n.end_of_work }}</h4>
+    <h4>Условия: {{ n.safety }}</h4>
+
+{% endfor %}
+{% endblock %}
+
+

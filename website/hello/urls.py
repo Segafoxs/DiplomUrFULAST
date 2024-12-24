@@ -7,6 +7,7 @@ urlpatterns = [
     path("welcomePage/", views.first_page, name="welcomePage"),
     path("workPermit/", views.work_permit, name="workPermit"),
     path("currentPermit/", views.lists, name="currentPermit"),
+    path("viewPermit/", views.view_permit, name="view_permit"),
     path("docsSign/", views.docx_sign, name="docsSign"),
     path("workPermit/postDirector/", views.postDirector),
     path("workPermit/postManager/", views.postManager),

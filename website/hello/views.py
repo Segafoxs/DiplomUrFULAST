@@ -32,6 +32,13 @@ class ListViews(SingleTableMixin, FilterView):
     filterset_class = MyFilter
 
 
+def view_permit(request):
+    if request.method == "POST":
+        number = request.POST.get("number")
+
+        permit = Permit.objects.filter(number=number)
+        return render(request, 'hello/currentWorkPermits/viewCurrentPermit.html', context={"permit": permit})
+
 def example(request):
     form = DepartmentForm()
     context = {
@@ -123,18 +130,21 @@ def lists(request):
     filterset_class = MyFilter(request.GET, model)
     table = PersonTable(filterset_class.qs)
 
+    permit = Permit.objects.filter(number=1345)
+
 
     return render(request=request, template_name='hello/currentWorkPermits/currentWork.html',
-                  context={"model":model, "table":table, "filterset_class":filterset_class})
+                  context={"model":model, "table":table, "filterset_class":filterset_class, "permit": permit})
 
 @login_required
 def docx_sign(request):
     current_user = request.user
 
     status_map = {
-        'DIRECTOR': "На согласовании",
-        'STATIONENGINEER': "На согласовании с дежурным менеджером",
-        'DAILYMANAGER': "На согласовании с DAILYMANAGER"
+        'MASTER': "На согласовании с руководителем работ",
+        'DIRECTOR': "На согласовании с начальником цеха",
+        'STATIONENGINEER': "На согласовании с дежурным инженером станции",
+        'DAILYMANAGER': "На согласовании с начальником смены"
     }
 
     status_filter = status_map.get(current_user.role)
@@ -143,7 +153,7 @@ def docx_sign(request):
         return render(request, 'hello/docsSign/docsSign.html', {"permit_list": []})
 
     latest_permit_list = Permit.objects.filter(status=status_filter).select_related(
-        'daily_manager', 'master_of_work'
+        'daily_manager', 'master_of_work', 'director', 'station_engineer'
     )
 
     context = {
@@ -163,7 +173,9 @@ def update_permit_status(request):
 
         current_user = request.user
 
-        if current_user.role == "DIRECTOR":
+        if current_user.role == "MASTER":
+            permit.signature_master = current_user.token
+        elif current_user.role == "DIRECTOR":
             permit.signature_director = current_user.token
         elif current_user.role == "DAILYMANAGER":
             permit.signature_dailymanager = current_user.token
@@ -172,11 +184,13 @@ def update_permit_status(request):
         else:
             return HttpResponse("У вас нет прав для подписи.", status=403)
         
-        if permit.status == "На согласовании":
-            permit.status = "На согласовании с дежурным менеджером"
-        elif permit.status == "На согласовании с дежурным менеджером":
-            permit.status = "На согласовании с DAILYMANAGER"
-        elif permit.status == "На согласовании с DAILYMANAGER":
+        if permit.status == "На согласовании с руководителем работ":
+            permit.status = "На согласовании с начальником цеха"
+        elif permit.status == "На согласовании с начальником цеха":
+            permit.status = "На согласовании с дежурным инженером станции"
+        elif permit.status == "На согласовании с дежурным инженером станции":
+            permit.status = "На согласовании с начальником смены"
+        elif permit.status == "На согласовании с начальником смены":
             permit.status = "В работе"
         else:
             return HttpResponse("Невозможно обновить статус.", status=400)
@@ -370,7 +384,7 @@ def resultPermit(request):
                           safety=new_permit.safety, workers=new_permit.workers
                           )
             data.save()
-            return HttpResponse("Наряд успешно сформирован!")
+            return HttpResponse({"success": "Наряд успешно сформирован!"})
 
 
 
@@ -383,9 +397,19 @@ def resultPermit(request):
         return HttpResponse(f"{err}")
 
 
-def add_permit_in_bd(request):
+def remove_permit_in_bd(request, pk):
 
-    pass
+    permit = Permit.objects.get(number=pk)
+
+    if request.method == "POST":
+        permit.delete()
+        return redirect('/currentPermit')
+
+    context = {
+        'permit': permit,
+    }
+
+    return render(request, 'hello/currentWorkPermits/currentWork.html', context)
 
 
 def firePermit(request):

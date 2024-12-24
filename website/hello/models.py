@@ -100,7 +100,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
 class Permit(models.Model):
     statusPermit = {
-        "approval": "На согласовании",
+        "approval": "На согласовании с руководителем работ",
         "work": "В работе",
         "closed": "Закрыт",
     }
@@ -109,6 +109,7 @@ class Permit(models.Model):
     status = models.CharField(max_length=255, choices=statusPermit, default=statusPermit["approval"])
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, verbose_name="Департамент")
     master_of_work = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="masterofwork")
+    signature_master = signature_director = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись мастера")
     executor = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="executorofwork")
     countWorker = models.CharField(max_length=255, null=False)
     # employ = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="employofwork")
