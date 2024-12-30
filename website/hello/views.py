@@ -47,6 +47,8 @@ def example(request):
 
     return render(request, 'hello/example', context)
 
+
+
 def create_employee(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -71,7 +73,7 @@ def create_employee(request):
 
 
 
-    return render(request, 'hello/createUser/create_user.html')
+    # return render(request, 'hello/createUser/create_user.html')
 
 def authFunc(request):
     if request.method == 'POST':
@@ -186,7 +188,7 @@ def update_permit_status(request):
             permit.signature_stationengineer = current_user.token
         else:
             return HttpResponse("У вас нет прав для подписи.", status=403)
-        
+
         if permit.status == "На согласовании с руководителем работ":
             permit.status = "На согласовании с начальником цеха"
         elif permit.status == "На согласовании с начальником цеха":
@@ -203,7 +205,7 @@ def update_permit_status(request):
         return redirect("docsSign")
     else:
         return HttpResponse("Метод не поддерживается.", status=405)
-    
+
 
 
 def postDirector(request):
@@ -282,7 +284,7 @@ def postShiftManager(request):
                     shiftManager_id = user.id
                     user_from_permit['shiftManager'] = shiftManager_id
                     print(f'{user.id} {user.name} {user.role}')
-                
+
                 return JsonResponse({"success": "Начальник смены добавлен успешно", "users": list(users.values())})
             else:
                 return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
@@ -304,7 +306,7 @@ def postStateEngineer(request):
                     stateEngineer_id = user.id
                     user_from_permit['stateEngineer'] = stateEngineer_id
                     print(f'{user.id} {user.name} {user.role}')
-                
+
                 return JsonResponse({"success": "Дежурный инженер станции добавлен успешно", "users": list(users.values())})
             else:
                 return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
