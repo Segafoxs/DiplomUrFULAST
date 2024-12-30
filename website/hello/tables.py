@@ -3,11 +3,11 @@ import django_tables2 as tables
 from .models import Permit
 from django.utils.html import format_html
 
-class PersonTable(tables.Table):
+class PermitTable(tables.Table):
+
     signature_status = tables.Column(empty_values=(), verbose_name="Подпись")
     view_permit = tables.TemplateColumn(template_code='<a href="#" data-bs-toggle="modal" data-bs-target="#PermitModal"">Просмотр</a>',
                                         verbose_name="Информация")
-    close_permit = tables.TemplateColumn(template_code='<button type="submit" class="btn btn-primary btn-sm">Закрыть</button>')
     class Meta:
         model = Permit
         template_name = "django_tables2/bootstrap.html"

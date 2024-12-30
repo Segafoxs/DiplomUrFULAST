@@ -16,6 +16,7 @@ urlpatterns = [
     path("workPermit/postStateEngineer/", views.postStateEngineer),
     path("workPermit/postShiftManager/", views.postShiftManager),
     path("workPermit/resultWorkPermit/", views.resultPermit, name="resultPermit"),
+    path("closePermit/", views.close_permit, name="closePermit"),
     path("firePermit/", views.firePermit, name="firePermit"),
     path('create-employee/', create_employee, name='create_employee'),
     path('update-permit-status/', update_permit_status, name='update_permit_status'),

@@ -13,21 +13,21 @@ from .myModels import Work_is_mymodel, Manager_is_mymodel, Executor_is_mymodel, 
 from .dbFunc import select_in_db
 from datetime import datetime
 from django.utils.timezone import make_aware
-from .models import Employee, Permit, Department
+from .models import Employee, Permit, Department, HistoryPermit
 from django.contrib.auth.decorators import login_required
 from .forms import LinePermit, LoginForm, ChoiceManager, DepartmentForm, WorkerGroup
-from .tables import PersonTable
+from .tables import PermitTable
 from .filters import MyFilter
 from django.http import JsonResponse
 from .myFunc import return_members
-import random
+
 
 
 user_from_permit = {}
 
 class ListViews(SingleTableMixin, FilterView):
     model = Permit
-    table_class = PersonTable
+    table_class = PermitTable
     template_name = 'hello/currentWorkPermits/currentWork.html'
     filterset_class = MyFilter
 
@@ -128,7 +128,7 @@ def docx_sign(request):
 def lists(request):
     model = Permit.objects.all()
     filterset_class = MyFilter(request.GET, model)
-    table = PersonTable(filterset_class.qs)
+    table = PermitTable(filterset_class.qs)
 
     permit = Permit.objects.filter(number=1345)
 
@@ -156,8 +156,11 @@ def docx_sign(request):
         'daily_manager', 'master_of_work', 'director', 'station_engineer'
     )
 
+    close_permit = Permit.objects.filter(status="Закрытие")
+
     context = {
-        "permit_list": latest_permit_list,
+        "permit_list_open": latest_permit_list,
+        "permit_list_close": close_permit,
         "role": current_user.role
     }
 
@@ -216,7 +219,7 @@ def postDirector(request):
                     director_id = user.id
                     user_from_permit['director'] = director_id
                     print(f'{user.id} {user.name} {user.role}')
-                return JsonResponse({"success": "Директор добавлен успешно", "users": list(user_from_db.values())})
+                return JsonResponse({"success": "Начальник цеха добавлен успешно", "users": list(user_from_db.values())})
             else:
                 return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
         return JsonResponse({"error": "Метод не поддерживается"}, status=405)
@@ -334,18 +337,18 @@ def postWorker(request):
 
 def resultPermit(request):
 
+    list_user = {}
+
     try:
 
         if request.method == "POST":
 
-
-
             new_permit = Permit()
-            new_permit.number = request.POST.get("number_permit")
             new_permit.department = Department.objects.get(id=request.POST.get("department"))
 
             #Участники наряда
             new_permit.master_of_work = Employee.objects.get(id=user_from_permit['manager'])
+            # list_user['manager']=Employee.objects.get(id=)
             # #new_permit.master_signature
             new_permit.executor = Employee.objects.get(id=user_from_permit['executor'])
             new_permit.countWorker = request.POST.get("countMember")
@@ -362,7 +365,12 @@ def resultPermit(request):
             d_end = request.POST.get("dateEnd")
             t_end = request.POST.get("timeEnd")
             end_datetime = datetime.strptime(f"{d_end} {t_end}", "%Y-%m-%d %H:%M")
-            new_permit.end_of_work = make_aware(end_datetime) 
+            new_permit.end_of_work = make_aware(end_datetime)
+
+            dateDelivery = request.POST.get("dateDelivery")
+            timeDelivery = request.POST.get("timeDelivery")
+            d_Delivery = datetime.strptime(f"{dateDelivery} {timeDelivery}", "%Y-%m-%d %H:%M")
+            new_permit.date_delivery = make_aware(d_Delivery)
             new_permit.condition = request.POST.get("conditions")
             new_permit.safety = request.POST.getlist("source")
 
@@ -375,15 +383,16 @@ def resultPermit(request):
             new_permit.workers = members
             result = return_members(members)
 
-            new_permit.to_docx(result)
-            data = Permit(number=new_permit.number, master_of_work=new_permit.master_of_work,
+
+            data = Permit(master_of_work=new_permit.master_of_work,
                           executor=new_permit.executor, director=new_permit.director, daily_manager=new_permit.daily_manager,
                           station_engineer=new_permit.station_engineer, work_description=new_permit.work_description,
-                          start_of_work=new_permit.start_of_work, end_of_work=new_permit.end_of_work,
+                          start_of_work=new_permit.start_of_work, end_of_work=new_permit.end_of_work, date_delivery=new_permit.date_delivery,
                           condition=new_permit.condition ,countWorker=new_permit.countWorker, department=new_permit.department,
                           safety=new_permit.safety, workers=new_permit.workers
                           )
             data.save()
+            data.to_docx(result, )
             return HttpResponse({"success": "Наряд успешно сформирован!"})
 
 
@@ -397,19 +406,53 @@ def resultPermit(request):
         return HttpResponse(f"{err}")
 
 
-def remove_permit_in_bd(request, pk):
+def close_permit(request):
+    safetyPermit = {
+        'wrong': "Не правильно оформлен наряд.",
+        'endWork': "Работа полностью закончена.",
 
-    permit = Permit.objects.get(number=pk)
-
-    if request.method == "POST":
-        permit.delete()
-        return redirect('/currentPermit')
-
-    context = {
-        'permit': permit,
     }
 
-    return render(request, 'hello/currentWorkPermits/currentWork.html', context)
+
+    if request.method == "POST":
+        number = request.POST.get('number')
+        safety = request.POST.get('safetyRequirements')
+        try:
+            permit = Permit.objects.get(number=number)
+
+            if permit is not None:
+                if safetyPermit[safety] == safetyPermit['endWork'] and permit.status=="В работе" or safetyPermit[safety] == safetyPermit['wrong'] and permit.status=="В работе":
+                    historyPermit = HistoryPermit.objects.create(number=permit.number,
+                                                                 status="Закрыт",
+                                                                 reason=safetyPermit[safety],
+                                                                 department_name=permit.department,
+                                                                 master_of_work=permit.master_of_work,
+                                                                 signature_master=permit.signature_master,
+                                                                 executor=permit.executor,
+                                                                 countWorker=permit.countWorker,
+                                                                 workers=permit.workers,
+                                                                 work_description=permit.work_description,
+                                                                 start_of_work=permit.start_of_work,
+                                                                 end_of_work=permit.end_of_work,
+                                                                 signature_director=permit.signature_director,
+                                                                 signature_dailymanager=permit.signature_dailymanager,
+                                                                 signature_stationengineer=permit.signature_stationengineer,
+                                                                 safety=permit.safety,
+                                                                 condition=permit.condition,
+                                                                 director=permit.director,
+                                                                 daily_manager=permit.daily_manager,
+                                                                 station_engineer=permit.station_engineer,
+                                                                 )
+                    permit.delete()
+                    return redirect('/currentPermit')
+                else:
+                    permit.delete()
+                    return redirect('/currentPermit')
+
+            return render(request, 'hello/currentWorkPermits/currentWork.html')
+
+        except Exception as err:
+            return JsonResponse({"error": str(err)}, status=500)
 
 
 def firePermit(request):

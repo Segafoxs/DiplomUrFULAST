@@ -45,19 +45,15 @@
 </svg> <span class="d-none d-sm-inline text-white">Наряд-допуск линейный</span></a>
                             </li>
                             <li>
-                                <a href="#" class="nav-link px-0"><svg color="white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"/>
-  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-</svg> <span class="d-none d-sm-inline text-white">Наряд-допуск повышенной опасности</span></a>
+                                <a href="#" class="nav-link px-0 align-middle" data-bs-toggle="modal" data-bs-target="#closePermit">
+                            <svg color="white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-check" viewBox="0 0 16 16">
+                                <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3.5-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5V5h4V3.5z"/>
+                                <path d="M10.854 8.146a.5.5 0 0 0-.708 0L8.5 9.793l-1.146-1.147a.5.5 0 0 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0 0-.708z"/>
+                            </svg>
+                            <span class="ms-1 d-none d-sm-inline text-white">Закрыть наряд-допуск</span>
+                        </a>
                             </li>
-                            <li>
-                                <a href="#" class="nav-link px-0"><svg color="white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"/>
-  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-</svg> <span class="d-none d-sm-inline text-white">Наряд-допуск огневой</span></a>
-                            </li>
+
                             <li>
                                 <a href="#" class="nav-link px-0 align-middle" data-bs-toggle="modal" data-bs-target="#createUserModal">
                                     <svg color="white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
@@ -69,6 +65,7 @@
                             </li>                
                         </ul>
                     </li>
+
                     <li>
                         <a href="{% url 'docsSign' %}" class="nav-link px-0 align-middle">
                             <svg color="white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-check" viewBox="0 0 16 16">
@@ -79,12 +76,7 @@
                         </a>
                     </li>
                     
-                    <li>
-                        <a href="#submenu2" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
-                            <i class="fs-4 bi-bootstrap"></i> <span class="ms-1 d-none d-sm-inline"></span></a>
 
-                    </li>
-                    <li>
                         <a href="#submenu3" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                             <i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline"></span> </a>
 
@@ -100,7 +92,7 @@
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
 
                         <img src="{% static 'hello/img/img.png' %}" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                        <span class="d-none d-sm-inline mx-1">Мастер ТЦ</span>
+                        <span class="d-none d-sm-inline mx-1">User</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                         <li><a class="dropdown-item" href="#">Settings</a></li>
@@ -172,6 +164,44 @@
     </div>
 </div>
 
+<div class="modal fade" id="closePermit" tabindex="-1" aria-labelledby="viewPermitModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPermitModal">Закрытие наряда</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form method="post" action="{% url 'closePermit' %}">
+                {% csrf_token %}
+
+
+                <div class="modal-body">
+                    <div class="mb-3">
+
+
+                        <div class="mb-3">
+                            <label for="number" class="form-label">Введите номер наряда</label>
+                            <input type="text" class="form-control" id="number" name="number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="safetyRequirements" class="form-label">Укажите причину закрытия</label>
+                            <select class="form-select" id="safetyRequirements" name="safetyRequirements">
+                                <option value="wrong">Не правильно оформлен наряд.</option>
+                                <option value="endWork">Работа полностью закончена.</option>
+<!--                                <option value="Обнаружены риски.">Обнаружены риски.</option>-->
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

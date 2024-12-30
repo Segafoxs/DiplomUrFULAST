@@ -13,7 +13,7 @@ class LoginForm(forms.Form):
 
 
 class DepartmentForm(forms.Form):
-    department = forms.ModelChoiceField(queryset=Department.objects.all(), label="department", widget=forms.Select(attrs={"class": "form-select form-select-lg mb-3",
+    department = forms.ModelChoiceField(label="Подразделение", queryset=Department.objects.all(), widget=forms.Select(attrs={"class": "form-select form-select-lg mb-3",
                                                                                                                           "name": "department"}))
 
 

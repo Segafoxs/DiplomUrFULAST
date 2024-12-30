@@ -1,6 +1,6 @@
 import django.db.models
 from django.contrib import admin
-from .models import Employee, Permit, Department, TypeOfWork, HistoryPermit
+from .models import Post, Employee, Permit, Department, TypeOfWork, HistoryPermit
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
@@ -14,6 +14,9 @@ class TypeOfWorkAdmin(admin.ModelAdmin):
 class EmployeeAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    pass
 
 @admin.action(description="Generate docx file")
 def generate_docx(modeladmin, request, queryset: django.db.models.QuerySet):

@@ -11,13 +11,8 @@ from cryptography.fernet import Fernet
 import hashlib
 import os
 
-from .myFunc import return_members
+from .myFunc import return_members, roles
 
-# Create your models here.
-
-# class Employee(models.Model):
-#     name = models.CharField(max_length=100)
-#     postemploee = models.CharField(max_length=50)
 
 
 
@@ -57,19 +52,21 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+class Post(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    create_at = models.DateTimeField(auto_created=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
     
 class Employee(AbstractBaseUser, PermissionsMixin):
-    roles = {
-        "DIRECTOR": "Начальник цеха",
-        "MASTER": "Мастер",
-        "WORKER": "Работник",
-        "DAILYMANAGER": "Ежедневный менеджер",
-        "STATIONENGINEER": "Инженер станции",
-    }
-
     name = models.CharField(max_length=100)
     role = models.CharField(max_length=255, choices=[(key, value) for key, value in roles.items()])
+    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, verbose_name="Должность")
     email = models.EmailField(unique=True)
+    password = models.CharField(max_length=100)
     department = models.ForeignKey(Department, null=True, on_delete=models.SET_NULL)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -82,13 +79,16 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
+    #  возвращение строкового названия объекта
     def __str__(self):
         return self.name
 
+    # создание токена для создание подписи наряда-допуска
     def generate_token(self):
         salt = os.urandom(16).hex()
         data = f"{self.email}{salt}{self.password}"
         return hashlib.md5(data.encode('utf-8')).hexdigest()
+
 
     def save(self, *args, **kwargs):
 
@@ -102,18 +102,18 @@ class Permit(models.Model):
     statusPermit = {
         "approval": "На согласовании с руководителем работ",
         "work": "В работе",
+        "closure": "Закрытие",
         "closed": "Закрыт",
     }
 
-    number = models.BigAutoField(primary_key=True)
+    number = models.AutoField(primary_key=True)
     status = models.CharField(max_length=255, choices=statusPermit, default=statusPermit["approval"])
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, verbose_name="Департамент")
     master_of_work = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="masterofwork")
-    signature_master = signature_director = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись мастера")
+    signature_master = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись мастера")
     executor = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="executorofwork")
     countWorker = models.CharField(max_length=255, null=False)
-    # employ = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="employofwork")
-    #master_signature = models.CharField(max_length=255)
+
     workers = ArrayField(
         ArrayField(
             models.CharField(max_length=100, blank=True),
@@ -124,9 +124,9 @@ class Permit(models.Model):
     work_description = models.CharField(max_length=255)
     start_of_work = models.DateTimeField(max_length=255)
     end_of_work = models.DateTimeField(max_length=255)
-    signature_director = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись директора")
-    signature_dailymanager = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись DailyManager")
-    signature_stationengineer = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись StationEngineer")
+
+    date_delivery = models.DateTimeField(max_length=255)
+
     safety = ArrayField(
           ArrayField(
              models.CharField(max_length=100, blank=True),
@@ -137,13 +137,15 @@ class Permit(models.Model):
     condition = models.CharField(max_length=255)
 
     director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="time")
-    #signature_from_director = models.CharField(max_length=255)
+    signature_director = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись директора")
 
     daily_manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="dailymanager")
-    #signature_from_daily_manager = models.CharField(max_length=255)
+    signature_dailymanager = models.CharField(max_length=255, null=True, blank=True,
+                                              verbose_name="Подпись DailyManager")
 
     station_engineer = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="statengineer")
-    #signature_from_station_engineer = models.CharField(max_length=255)
+    signature_stationengineer = models.CharField(max_length=255, null=True, blank=True,
+                                                 verbose_name="Подпись StationEngineer")
 
     #create_at = models.DateTimeField()
     #updated_at = models.DateTimeField()
@@ -170,14 +172,16 @@ class Permit(models.Model):
         return self.type_of_permit
 
     def to_docx(self, result):
+
+
         doc = DocxTemplate(r"C:\\Users\\Сергей\\Desktop\\Шаблоны для ЭНД\\test.docx")
         context = {
             'number': self.number,
             'department': self.department,
             'manager': self.master_of_work,
-            'managerPost': self.master_of_work,
+            'managerPost': roles[self.master_of_work.role],
             'executor': self.executor,
-            'executorPost': self.executor,
+            'executorPost': roles[self.executor.role],
             'countMember': self.countWorker,
             'workers': result,
             'work': self.work_description,
@@ -185,12 +189,13 @@ class Permit(models.Model):
             'timeStart': self.start_of_work,
             'dateEnd': self.end_of_work,
             'timeEnd': self.end_of_work,
+            'dateDelivery': self.date_delivery,
             'safety': self.safety,
             'conditions': self.condition,
             'director': self.director,
-            'directorPost': self.director,
+            'directorPost': roles[self.director.role],
             'dailyManager': self.daily_manager,
-            'personalPost': self.daily_manager,
+            'personalPost': roles[self.daily_manager.role],
             'stateEngineer': self.station_engineer,
         }
         doc.render(context)
@@ -241,37 +246,42 @@ class State:
 
 
 class HistoryPermit(models.Model):
-    type_of_permit = {
-        "SIMPLE": "simple",
-        "LINEAR": "linear",
-        "FIRE": "fire",
-    }
 
+    number = models.AutoField(primary_key=True)
+    status = models.CharField(max_length=255)
+    reason = models.CharField(max_length=255)
     department_name = models.CharField(max_length=255)
-    type_of = models.CharField(max_length=255, choices=type_of_permit)
-    number = models.CharField(max_length=255, null=False)
     master_of_work = models.CharField(max_length=255)
-    worker = models.CharField(max_length=255)
-    # employ =
-    master = models.CharField(max_length=255)
+    signature_master = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись мастера")
+    executor = models.CharField(max_length=255)
+    countWorker = models.CharField(max_length=255)
+    workers = ArrayField(
+        ArrayField(
+            models.CharField(max_length=100, blank=True),
+            size=10,
+        ),
+        size=8,
+    )
+
     work_description = models.CharField(max_length=255)
     start_of_work = models.DateTimeField(max_length=255)
     end_of_work = models.DateTimeField(max_length=255)
-    #    type_of_work = ArrayField(
-    #       ArrayField(
-    #          models.CharField(max_length=10, blank=True),
-    #         size=8,
-    #     ),
-    #     size=8,
-    # )
+    signature_director = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись директора")
+    signature_dailymanager = models.CharField(max_length=255, null=True, blank=True,
+                                              verbose_name="Подпись DailyManager")
+    signature_stationengineer = models.CharField(max_length=255, null=True, blank=True,
+                                                 verbose_name="Подпись StationEngineer")
+    safety = ArrayField(
+        ArrayField(
+            models.CharField(max_length=100, blank=True),
+            size=10,
+        ),
+        size=8,
+    )
     condition = models.CharField(max_length=255)
-
-    time_of_permit = models.CharField(max_length=255, verbose_name="Наряд выдал")
-    signature_from_director = models.CharField(max_length=255)
-    signature_from_daily_manager = models.CharField(max_length=255)
-
-    create_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    director = models.CharField(max_length=255)
+    daily_manager = models.CharField(max_length=255)
+    station_engineer = models.CharField(max_length=255)
 
 
 
