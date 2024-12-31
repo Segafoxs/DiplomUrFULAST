@@ -11,17 +11,19 @@
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Номер наряда</th>
+                    <th scope="col">Действие</th>
                     <th scope="col">Руководитель работ</th>
                     <th scope="col">Работа</th>
                     <th scope="col">Дата начала работы</th>
                     <th scope="col">Дата окончания работы</th>
-                    <th scope="col">Действия</th>
+                    <th scope="col">Подпись</th>
                 </tr>
             </thead>
             <tbody>
                 {% for permit in permit_list_open %}
                     <tr>
                         <td>{{ permit.number }}</td>
+                        <td> {{ permit.action }}</td>
                         <td>{{ permit.master_of_work.name }}</td>
                         <td>{{ permit.work_description }}</td>
                         <td>{{ permit.start_of_work|date:"d.m.Y H:i" }}</td>
@@ -46,11 +48,12 @@
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Номер наряда</th>
+                    <th scope="col">Действие</th>
                     <th scope="col">Руководитель работ</th>
                     <th scope="col">Работа</th>
                     <th scope="col">Дата начала работы</th>
                     <th scope="col">Дата окончания работы</th>
-                    <th scope="col">Действия</th>
+                    <th scope="col">Подпись</th>
                 </tr>
             </thead>
             <tbody>
@@ -58,6 +61,7 @@
                 {% for permit in permit_list_close %}
                     <tr>
                         <td>{{ permit.number }}</td>
+                        <td> {{ permit.action }}</td>
                         <td>{{ permit.master_of_work.name }}</td>
                         <td>{{ permit.work_description }}</td>
                         <td>{{ permit.start_of_work|date:"d.m.Y H:i" }}</td>

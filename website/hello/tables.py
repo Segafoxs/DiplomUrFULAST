@@ -11,7 +11,7 @@ class PermitTable(tables.Table):
     class Meta:
         model = Permit
         template_name = "django_tables2/bootstrap.html"
-        fields = ("number", "status", "department")
+        fields = ("number", "action", "status", "department")
 
     def render_signature_status(self, record):
 

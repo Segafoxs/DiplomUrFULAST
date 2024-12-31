@@ -48,7 +48,6 @@ def example(request):
     return render(request, 'hello/example', context)
 
 
-
 def create_employee(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -154,11 +153,11 @@ def docx_sign(request):
     if not status_filter:
         return render(request, 'hello/docsSign/docsSign.html', {"permit_list": []})
 
-    latest_permit_list = Permit.objects.filter(status=status_filter).select_related(
+    latest_permit_list = Permit.objects.filter(status=status_filter, action="ОТКРЫТИЕ").select_related(
         'daily_manager', 'master_of_work', 'director', 'station_engineer'
     )
 
-    close_permit = Permit.objects.filter(status="Закрытие")
+    close_permit = Permit.objects.filter(status=status_filter, action="ЗАКРЫТИЕ")
 
     context = {
         "permit_list_open": latest_permit_list,
@@ -189,20 +188,57 @@ def update_permit_status(request):
         else:
             return HttpResponse("У вас нет прав для подписи.", status=403)
 
-        if permit.status == "На согласовании с руководителем работ":
-            permit.status = "На согласовании с начальником цеха"
-        elif permit.status == "На согласовании с начальником цеха":
-            permit.status = "На согласовании с дежурным инженером станции"
-        elif permit.status == "На согласовании с дежурным инженером станции":
-            permit.status = "На согласовании с начальником смены"
-        elif permit.status == "На согласовании с начальником смены":
-            permit.status = "В работе"
-        else:
-            return HttpResponse("Невозможно обновить статус.", status=400)
+        if permit.action == "ОТКРЫТИЕ":
+            if permit.status == "На согласовании с руководителем работ":
+                permit.status = "На согласовании с начальником цеха"
+            elif permit.status == "На согласовании с начальником цеха":
+                permit.status = "На согласовании с дежурным инженером станции"
+            elif permit.status == "На согласовании с дежурным инженером станции":
+                permit.status = "На согласовании с начальником смены"
+            elif permit.status == "На согласовании с начальником смены":
+                 permit.status = "В работе"
+                 permit.action = "ОТКРЫТ"
 
+
+
+
+        if permit.action == "ЗАКРЫТИЕ":
+            if permit.status == "На согласовании с руководителем работ":
+                permit.status = "На согласовании с начальником смены"
+            elif permit.status == "На согласовании с начальником смены":
+                permit.status = "Закрыт"
+                his_perm = HistoryPermit.objects.create(number=permit.number,
+                                                                 status="Закрыт",
+                                                                 reason="Работа полностью закончена",
+                                                                 department_name=permit.department,
+                                                                 master_of_work=permit.master_of_work,
+                                                                 signature_master=permit.signature_master,
+                                                                 executor=permit.executor,
+                                                                 countWorker=permit.countWorker,
+                                                                 workers=permit.workers,
+                                                                 work_description=permit.work_description,
+                                                                 start_of_work=permit.start_of_work,
+                                                                 end_of_work=permit.end_of_work,
+                                                                 signature_director=permit.signature_director,
+                                                                 signature_dailymanager=permit.signature_dailymanager,
+                                                                 signature_stationengineer=permit.signature_stationengineer,
+                                                                 safety=permit.safety,
+                                                                 condition=permit.condition,
+                                                                 director=permit.director,
+                                                                 daily_manager=permit.daily_manager,
+                                                                 station_engineer=permit.station_engineer,
+                                                                 )
+                permit.delete()
+                return redirect('/currentPermit')
+
+            else:
+                return HttpResponse("Невозможно обновить статус.", status=400)
         permit.save()
-
         return redirect("docsSign")
+
+
+
+
     else:
         return HttpResponse("Метод не поддерживается.", status=405)
 
@@ -350,8 +386,6 @@ def resultPermit(request):
 
             #Участники наряда
             new_permit.master_of_work = Employee.objects.get(id=user_from_permit['manager'])
-            # list_user['manager']=Employee.objects.get(id=)
-            # #new_permit.master_signature
             new_permit.executor = Employee.objects.get(id=user_from_permit['executor'])
             new_permit.countWorker = request.POST.get("countMember")
             new_permit.daily_manager = Employee.objects.get(id=user_from_permit['shiftManager'])
@@ -420,10 +454,10 @@ def close_permit(request):
         number = request.POST.get('number')
         safety = request.POST.get('safetyRequirements')
         try:
-            permit = Permit.objects.get(number=number)
+            permit = Permit.objects.get( number=number)
 
             if permit is not None:
-                if safetyPermit[safety] == safetyPermit['endWork'] and permit.status=="В работе" or safetyPermit[safety] == safetyPermit['wrong'] and permit.status=="В работе":
+                if safetyPermit[safety] == safetyPermit['wrong'] and permit.status=="В работе":
                     historyPermit = HistoryPermit.objects.create(number=permit.number,
                                                                  status="Закрыт",
                                                                  reason=safetyPermit[safety],
@@ -446,6 +480,12 @@ def close_permit(request):
                                                                  station_engineer=permit.station_engineer,
                                                                  )
                     permit.delete()
+                    return redirect('/currentPermit')
+
+                elif safetyPermit[safety] == safetyPermit['endWork'] and permit.status == "В работе":
+                    permit.action = "ЗАКРЫТИЕ"
+                    permit.status = "На согласовании с руководителем работ"
+                    permit.save()
                     return redirect('/currentPermit')
                 else:
                     permit.delete()

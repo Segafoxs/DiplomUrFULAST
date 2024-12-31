@@ -106,7 +106,13 @@ class Permit(models.Model):
         "closed": "Закрыт",
     }
 
+    actions = {
+        "OPEN": "ОТКРЫТИЕ",
+        "CLOSE": "ЗАКРЫТИЕ"
+    }
+
     number = models.AutoField(primary_key=True)
+    action = models.CharField(max_length=255, choices=actions, default=actions["OPEN"])
     status = models.CharField(max_length=255, choices=statusPermit, default=statusPermit["approval"])
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, verbose_name="Департамент")
     master_of_work = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="masterofwork")
@@ -179,9 +185,9 @@ class Permit(models.Model):
             'number': self.number,
             'department': self.department,
             'manager': self.master_of_work,
-            'managerPost': roles[self.master_of_work.role],
+            'managerPost': self.master_of_work.post,
             'executor': self.executor,
-            'executorPost': roles[self.executor.role],
+            'executorPost': self.executor.post,
             'countMember': self.countWorker,
             'workers': result,
             'work': self.work_description,
@@ -193,9 +199,9 @@ class Permit(models.Model):
             'safety': self.safety,
             'conditions': self.condition,
             'director': self.director,
-            'directorPost': roles[self.director.role],
+            'directorPost': self.director.post,
             'dailyManager': self.daily_manager,
-            'personalPost': roles[self.daily_manager.role],
+            'personalPost': self.daily_manager.post,
             'stateEngineer': self.station_engineer,
         }
         doc.render(context)
