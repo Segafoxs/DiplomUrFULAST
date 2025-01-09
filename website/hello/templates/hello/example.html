@@ -12,10 +12,18 @@
     <link rel="stylesheet" href="{% static 'hello/css/styles.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
     <script src="{% static 'hello/js/test.js' %}"></script>
 
+
+
 </head>
+
 <body>
+    {% block sidebar %}
+
+<div class="stic">
     <div class="container-fluid">
     <div class="row flex-nowrap">
         <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
@@ -92,7 +100,7 @@
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
 
                         <img src="{% static 'hello/img/img.png' %}" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                        <span class="d-none d-sm-inline mx-1">User</span>
+                        <span class="d-none d-sm-inline mx-1"><font size="1">{{ request.user }}</font></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                         <li><a class="dropdown-item" href="#">Settings</a></li>
@@ -100,12 +108,12 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Выход</a></li>
                     </ul>
                 </div>
             </div>
         </div>
-
+        {% endblock %}
         <div class="col py-3">
             {% block content %}
 
@@ -202,7 +210,13 @@
         </div>
     </div>
 </div>
+</div>
+
+
+</div>
+
 
 </body>
+
 </html>
 

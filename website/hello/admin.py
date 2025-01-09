@@ -1,6 +1,9 @@
+import secrets
+import string
+
 import django.db.models
 from django.contrib import admin
-from .models import Post, Employee, Permit, Department, TypeOfWork, HistoryPermit
+from .models import Post, Employee, Permit, Department, TypeOfWork, HistoryPermit, PrivateKeys
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
@@ -37,8 +40,8 @@ class PermitAdmin(admin.ModelAdmin):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields['master_of_work'].queryset = Employee.objects.filter(role="MASTER")
         form.base_fields['executor'].queryset = Employee.objects.filter(role="WORKER")
-        form.base_fields['employ'].queryset = Employee.objects.filter(role="WORKER")
-        form.base_fields['master'].queryset = Employee.objects.filter(role="MASTER")
+        form.base_fields['workers'].queryset = Employee.objects.filter(role="WORKER")
+        form.base_fields['master_of_work'].queryset = Employee.objects.filter(role="MASTER")
         form.base_fields['director'].queryset = Employee.objects.filter(role="DIRECTOR")
         form.base_fields['daily_manager'].queryset = Employee.objects.filter(role="DAILYMANAGER")
         form.base_fields['station_engineer'].queryset = Employee.objects.filter(role="STATIONENGINEER")
@@ -47,3 +50,12 @@ class PermitAdmin(admin.ModelAdmin):
 @admin.register(HistoryPermit)
 class HistoryPermitAdmin(admin.ModelAdmin):
     actions = [generate_docx]
+
+@admin.register(PrivateKeys)
+class PrivateKeysAdmin(admin.ModelAdmin):
+    def get_changeform_initial_data(self, request):
+        initial_data = super().get_changeform_initial_data(request)
+        alphabet = string.ascii_letters + string.digits
+        password = ''.join(secrets.choice(alphabet) for i in range(32))
+        initial_data['private_key'] = password
+        return initial_data

@@ -24,6 +24,8 @@ class PermitTable(tables.Table):
             signatures.append("Подписано ДИС")
         if record.signature_stationengineer:
             signatures.append("Подписано начальником смены")
+        if record.signature_executor:
+            signatures.append("Подписано производителем работ")
         
         if not signatures:
             return "Нет подписи"

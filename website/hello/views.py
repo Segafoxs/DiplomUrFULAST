@@ -1,6 +1,8 @@
+import os
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.views.generic import ListView
 from django_filters import FilterSet
 from django.views.decorators.csrf import csrf_exempt
@@ -13,13 +15,14 @@ from .myModels import Work_is_mymodel, Manager_is_mymodel, Executor_is_mymodel, 
 from .dbFunc import select_in_db
 from datetime import datetime
 from django.utils.timezone import make_aware
-from .models import Employee, Permit, Department, HistoryPermit
+from .models import Employee, Permit, Department, HistoryPermit, PrivateKeys
 from django.contrib.auth.decorators import login_required
 from .forms import LinePermit, LoginForm, ChoiceManager, DepartmentForm, WorkerGroup
 from .tables import PermitTable
 from .filters import MyFilter
 from django.http import JsonResponse
-from .myFunc import return_members
+from .myFunc import return_members, rolesCreatePermit, roles
+from minio import Minio
 
 
 
@@ -38,14 +41,6 @@ def view_permit(request):
 
         permit = Permit.objects.filter(number=number)
         return render(request, 'hello/currentWorkPermits/viewCurrentPermit.html', context={"permit": permit})
-
-def example(request):
-    form = DepartmentForm()
-    context = {
-        "form": form
-    }
-
-    return render(request, 'hello/example', context)
 
 
 def create_employee(request):
@@ -89,11 +84,13 @@ def authFunc(request):
     return render(request, 'hello/authorization/index.html', {'form': form})
 
 
+def logoutFunc(request):
+    logout(request)
+    return redirect('/login/')
 
 
 def first_page(request):
-    values = {"count": 5}
-    return render(request, 'hello/firstPage/firstPage.html', values)
+    return render(request, 'hello/firstPage/firstPage.html')
 
 def work_permit(request):
 
@@ -145,7 +142,8 @@ def docx_sign(request):
         'MASTER': "На согласовании с руководителем работ",
         'DIRECTOR': "На согласовании с начальником цеха",
         'STATIONENGINEER': "На согласовании с дежурным инженером станции",
-        'DAILYMANAGER': "На согласовании с начальником смены"
+        'DAILYMANAGER': "На согласовании с начальником смены",
+        'EXECUTOR': "Подпись производителя работ"
     }
 
     status_filter = status_map.get(current_user.role)
@@ -167,83 +165,6 @@ def docx_sign(request):
 
     return render(request, 'hello/docsSign/docsSign.html', context)
 
-
-@login_required
-@csrf_exempt
-def update_permit_status(request):
-    if request.method == "POST":
-        permit_id = request.POST.get("permit_number")
-        permit = get_object_or_404(Permit, number=permit_id)
-
-        current_user = request.user
-
-        if current_user.role == "MASTER":
-            permit.signature_master = current_user.token
-        elif current_user.role == "DIRECTOR":
-            permit.signature_director = current_user.token
-        elif current_user.role == "DAILYMANAGER":
-            permit.signature_dailymanager = current_user.token
-        elif current_user.role == "STATIONENGINEER":
-            permit.signature_stationengineer = current_user.token
-        else:
-            return HttpResponse("У вас нет прав для подписи.", status=403)
-
-        if permit.action == "ОТКРЫТИЕ":
-            if permit.status == "На согласовании с руководителем работ":
-                permit.status = "На согласовании с начальником цеха"
-            elif permit.status == "На согласовании с начальником цеха":
-                permit.status = "На согласовании с дежурным инженером станции"
-            elif permit.status == "На согласовании с дежурным инженером станции":
-                permit.status = "На согласовании с начальником смены"
-            elif permit.status == "На согласовании с начальником смены":
-                 permit.status = "В работе"
-                 permit.action = "ОТКРЫТ"
-
-
-
-
-        if permit.action == "ЗАКРЫТИЕ":
-            if permit.status == "На согласовании с руководителем работ":
-                permit.status = "На согласовании с начальником смены"
-            elif permit.status == "На согласовании с начальником смены":
-                permit.status = "Закрыт"
-                his_perm = HistoryPermit.objects.create(number=permit.number,
-                                                                 status="Закрыт",
-                                                                 reason="Работа полностью закончена",
-                                                                 department_name=permit.department,
-                                                                 master_of_work=permit.master_of_work,
-                                                                 signature_master=permit.signature_master,
-                                                                 executor=permit.executor,
-                                                                 countWorker=permit.countWorker,
-                                                                 workers=permit.workers,
-                                                                 work_description=permit.work_description,
-                                                                 start_of_work=permit.start_of_work,
-                                                                 end_of_work=permit.end_of_work,
-                                                                 signature_director=permit.signature_director,
-                                                                 signature_dailymanager=permit.signature_dailymanager,
-                                                                 signature_stationengineer=permit.signature_stationengineer,
-                                                                 safety=permit.safety,
-                                                                 condition=permit.condition,
-                                                                 director=permit.director,
-                                                                 daily_manager=permit.daily_manager,
-                                                                 station_engineer=permit.station_engineer,
-                                                                 )
-                permit.delete()
-                return redirect('/currentPermit')
-
-            else:
-                return HttpResponse("Невозможно обновить статус.", status=400)
-        permit.save()
-        return redirect("docsSign")
-
-
-
-
-    else:
-        return HttpResponse("Метод не поддерживается.", status=405)
-
-
-
 def postDirector(request):
     try:
         if request.method == "POST":
@@ -253,7 +174,7 @@ def postDirector(request):
                 for user in user_from_db:
                     post = user.role
                     if user.role != "DIRECTOR":
-                        return JsonResponse({"error": f"{post} не может выдавать наряд-допуск"}, status=400)
+                        return JsonResponse({"error": f"{roles[post]} не может выдавать наряд-допуск"}, status=400)
                     director_id = user.id
                     user_from_permit['director'] = director_id
                     print(f'{user.id} {user.name} {user.role}')
@@ -273,8 +194,8 @@ def postManager(request):
             user_from_db = select_in_db(search_query)
             if user_from_db is not None:
                 for user in user_from_db:
-                    if user.role != "MASTER":
-                        return JsonResponse({"error": "Руководитель не может быть из числа рабочих"}, status=400)
+                    if user.role not in rolesCreatePermit:
+                        return JsonResponse({f"error": f"Руководителем не может быть {roles[user.role]}"}, status=400)
                     manager_id = user.id
                     user_from_permit['manager'] = manager_id
                     print(f'{user.id} {user.name} {user.role}')
@@ -428,18 +349,43 @@ def resultPermit(request):
                           safety=new_permit.safety, workers=new_permit.workers
                           )
             data.save()
-            data.to_docx(result, )
-            return HttpResponse({"success": "Наряд успешно сформирован!"})
+
+            data.to_docx(result, d_start, t_start, d_end, t_end, dateDelivery, timeDelivery)
+            # TODO move client to setting
+            client = Minio("127.0.0.1:9000",
+                           access_key="YOUR_ACCESS_KEY",
+                           secret_key="YOUR_SECRET_KEY",
+                           secure=False,
+                           )
+            bucket_name = "docs"
+
+            found = client.bucket_exists(bucket_name)
+            if not found:
+                client.make_bucket(bucket_name)
+                print("Created bucket", bucket_name)
+            else:
+                print("Bucket", bucket_name, "already exists")
+
+            # Upload the file, renaming it in the process
+            client.fput_object(
+                bucket_name, data.generate_file_name(), data.generate_file_name(),
+            )
+            print(
+                data.generate_file_name(), "successfully uploaded as object",
+                data.generate_file_name(), "to bucket", bucket_name,
+            )
+
+            os.remove(data.generate_file_name())
 
 
 
-
+            return JsonResponse({f"success": f"Наряд успешно сформирован! Ваш номер наряда {data.number}"}, status=200)
 
     except KeyError as err:
-        return HttpResponse(f"<h1>Заполните все поля<h1>{err}")
+        return JsonResponse({f"<h1>Заполните все поля<h1>{err}"})
 
     except Exception as err:
-        return HttpResponse(f"{err}")
+        return JsonResponse({f"{err}"})
 
 
 def close_permit(request):
@@ -449,8 +395,16 @@ def close_permit(request):
 
     }
 
+    list_user = {'MASTER': 'MASTER', 'DIRECTOR':'DIRECTOR',}
 
     if request.method == "POST":
+        current_user = request.user
+
+        temp = list_user.get(current_user.role)
+
+
+        if not temp:
+            return redirect('/currentPermit/')
         number = request.POST.get('number')
         safety = request.POST.get('safetyRequirements')
         try:

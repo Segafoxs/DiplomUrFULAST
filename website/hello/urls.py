@@ -1,9 +1,11 @@
 from django.urls import path
 from . import views
-from .views import ListViews, create_employee, update_permit_status
+from .views import ListViews, create_employee
+from .update_permit_status import update_permit_status
 
 urlpatterns = [
     path("login/", views.authFunc, name="authFunc"),
+    path("logout/", views.logoutFunc, name="logout"),
     path("welcomePage/", views.first_page, name="welcomePage"),
     path("workPermit/", views.work_permit, name="workPermit"),
     path("currentPermit/", views.lists, name="currentPermit"),

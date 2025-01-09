@@ -73,6 +73,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'website.wsgi.application'
 
+# MINIO BUCKET NAME
+MINIO_ADDRESS = "127.0.0.1:9000"
+MINIO_ACCESS_KEY = "YOUR_ACCESS_KEY"
+MINIO_SECRET_KEY = "YOUR_SECRET_KEY"
+MINIO_BUCKET_NAME = "docs"
+
+# ANVIL
+ANVIL_URL = "http://127.0.0.1:8545"
+ANVIL_CONTRACT_ADDRESS = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -135,3 +144,5 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# y0__wgBEL_5gKYEGMHdEyD6ka7-EXBIpTEjsfuQ8DuEScEKlaZBHXns

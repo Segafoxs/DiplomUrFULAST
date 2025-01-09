@@ -4,10 +4,15 @@ from django.shortcuts import render
 roles = {
             "DIRECTOR": "Начальник цеха",
             "MASTER": "Мастер",
-            "WORKER": "Работник",
+            "WORKER": "Рабочий",
             "DAILYMANAGER": "Начальник смены",
             "STATIONENGINEER": "Инженер станции",
         }
+
+rolesCreatePermit = {
+    "DIRECTOR": "Начальник цеха",
+    "MASTER": "Мастер",
+}
 
 
 def return_members(members: list):

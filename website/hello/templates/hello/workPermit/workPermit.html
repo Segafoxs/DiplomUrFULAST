@@ -98,7 +98,7 @@
 <!--            </div>-->
 
 
-  <form method="post" action="resultWorkPermit/" id="workPermitForm">
+  <form method="post" id="workPermitForm">
     {% csrf_token %}
     
     <div class="row align-items-center py-3">
@@ -221,7 +221,7 @@
 
     <div class="row">
         <div class="col-md-4">
-            <button type="submit" class="btn btn-primary">Сформировать наряд-допуск</button>
+            <button type="button" class="btn btn-primary" onclick="submitPost('workPermitForm', '/workPermit/resultWorkPermit/')">Сформировать наряд-допуск</button>
         </div>
     </div>
 </form>
@@ -302,23 +302,6 @@ function generateMemberFields(count) {
 </script>
 
 
-<!--        <p>Руководителю работ: <input type="text" name="managerPost" placeholder="должность">  <input type="text" name="manager" placeholder="ФИО"></p>-->
-<!--        <p>Производителю работ: <input type="text" name="executorPost" placeholder="должность">  <input type="text" name="executor" placeholder="ФИО"></p>-->
-<!--        <p>С членами бригады: <input type="text" name="countMember" placeholder="Количество членов бригады"> Члены бригады: <input type="text" name="member" placeholder="ФИО, разряд"></p>-->
-<!--        <p>Поручается выполнить: </p>-->
-<!--        <textarea name="work" id="workId" cols="50" rows="2"></textarea>-->
-
-<!--        <p>Начало работы: дата  <input type="date" name="dateStart" placeholder="Дата начала работы">  <input type="time" name="timeStart" placeholder="Дата начала работы">,-->
-<!--            Окончание: <input type="date" name="dateEnd" placeholder="время">  <input type="time" name="timeEnd" placeholder="время"></p>-->
-<!--&lt;!&ndash;        <p>Для обеспечения безопасных условий необходимо:</p>&ndash;&gt;-->
-<!--&lt;!&ndash;        <textarea name="safeComment" id="safeId" cols="50" rows="2"></textarea>&ndash;&gt;-->
-<!--        <p>Особые условия: <input type="text" name="conditions" placeholder="Особые условия"></p>-->
-<!--        <p>Наряд выдал: дата <input type="text" name="dateStart" placeholder="Дата">, должность <input type="text" name="directorPost" placeholder="Должность">  <input type="text" name="director" placeholder="ФИО"></p>-->
-<!--        <p>Дежурный персонал других цехов (участков) <input type="text" name="personalPost" placeholder="Должность">  <input type="text" name="personal" placeholder="ФИО"></p>-->
-
-
-
-<!--        <a href="{% url 'resultPermit' %}">Далее</a>-->
 
 
 {% endblock %}

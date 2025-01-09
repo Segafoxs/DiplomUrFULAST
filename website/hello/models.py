@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -118,6 +120,7 @@ class Permit(models.Model):
     master_of_work = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="masterofwork")
     signature_master = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись мастера")
     executor = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="executorofwork")
+    signature_executor = models.CharField(max_length=255, null=True, blank=True, verbose_name="Подпись производителя")
     countWorker = models.CharField(max_length=255, null=False)
 
     workers = ArrayField(
@@ -128,10 +131,10 @@ class Permit(models.Model):
         size=8,
     )
     work_description = models.CharField(max_length=255)
-    start_of_work = models.DateTimeField(max_length=255)
-    end_of_work = models.DateTimeField(max_length=255)
+    start_of_work = models.DateTimeField(max_length=255, null=False)
+    end_of_work = models.DateTimeField(max_length=255, null=False)
 
-    date_delivery = models.DateTimeField(max_length=255)
+    date_delivery = models.DateTimeField(max_length=255, null=False)
 
     safety = ArrayField(
           ArrayField(
@@ -175,9 +178,10 @@ class Permit(models.Model):
         super(Permit, self).save(*args)
 
     def __str__(self):
-        return self.type_of_permit
+        return str(self.number)
 
-    def to_docx(self, result):
+    def to_docx(self, result, d_start, t_start, d_end, t_end,
+                dataDelivery, timeDelivery) -> str:
 
 
         doc = DocxTemplate(r"C:\\Users\\Сергей\\Desktop\\Шаблоны для ЭНД\\test.docx")
@@ -186,16 +190,13 @@ class Permit(models.Model):
             'department': self.department,
             'manager': self.master_of_work,
             'managerPost': self.master_of_work.post,
+            'managerSignature': self.signature_master,
             'executor': self.executor,
             'executorPost': self.executor.post,
             'countMember': self.countWorker,
-            'workers': result,
+            'workers': self.countWorker,
             'work': self.work_description,
-            'dateStart': self.start_of_work,
-            'timeStart': self.start_of_work,
-            'dateEnd': self.end_of_work,
-            'timeEnd': self.end_of_work,
-            'dateDelivery': self.date_delivery,
+            'dateStart': self.date_delivery,
             'safety': self.safety,
             'conditions': self.condition,
             'director': self.director,
@@ -208,9 +209,13 @@ class Permit(models.Model):
 
         doc.save(self.generate_file_name())
 
+        return self.generate_file_name()
+
     def generate_file_name(self) -> str:
         return self.number.__str__() + ".docx"
 
+    def download_link(self) -> str:
+        return "http://" + settings.MINIO_ADDRESS + "/" + settings.MINIO_BUCKET_NAME + "/" + self.generate_file_name()
     def print_docx(self):
         pass
 
@@ -252,7 +257,6 @@ class State:
 
 
 class HistoryPermit(models.Model):
-
     number = models.AutoField(primary_key=True)
     status = models.CharField(max_length=255)
     reason = models.CharField(max_length=255)
@@ -277,6 +281,8 @@ class HistoryPermit(models.Model):
                                               verbose_name="Подпись DailyManager")
     signature_stationengineer = models.CharField(max_length=255, null=True, blank=True,
                                                  verbose_name="Подпись StationEngineer")
+    signature_executor = models.CharField(max_length=255, null=True, blank=True,
+                                              verbose_name="Подпись Executor")
     safety = ArrayField(
         ArrayField(
             models.CharField(max_length=100, blank=True),
@@ -289,5 +295,16 @@ class HistoryPermit(models.Model):
     daily_manager = models.CharField(max_length=255)
     station_engineer = models.CharField(max_length=255)
 
+    def __str__(self):
+        return str(self.number) + " " + self.work_description.name
 
+class PrivateKeys(models.Model):
+    employer = models.ForeignKey(Employee, on_delete=models.CASCADE, null=False)
+    private_key = models.CharField(max_length=255, null=False, validators=[
+                MinLengthValidator(32, 'the field must contain at least 50 characters')
+            ])
+    created_at = models.DateTimeField(auto_now_add=True)
+    expired_at = models.DateTimeField(auto_now=False, auto_now_add=False)
 
+    def __str__(self):
+        return "Приватный ключ " + self.employer.name
