@@ -3,15 +3,23 @@ import django_tables2 as tables
 from .models import Permit
 from django.utils.html import format_html
 
-class PermitTable(tables.Table):
 
+class Number(tables.Column):
+    def render(self, value):
+        return value
+
+
+class PermitTable(tables.Table):
     signature_status = tables.Column(empty_values=(), verbose_name="Подпись")
     view_permit = tables.TemplateColumn(template_code='<a href="#" data-bs-toggle="modal" data-bs-target="#PermitModal"">Просмотр</a>',
                                         verbose_name="Информация")
+
+
     class Meta:
         model = Permit
         template_name = "django_tables2/bootstrap.html"
         fields = ("number", "action", "status", "department")
+
 
     def render_signature_status(self, record):
 

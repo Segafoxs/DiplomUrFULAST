@@ -33,6 +33,6 @@ def read_all_chain_by_doc_id(doc_id):
     contract = web3.eth.contract(address=settings.ANVIL_CONTRACT_ADDRESS, abi=abi)
 
     def get_by_doc_id():
-        return contract.functions.findById().call(doc_id)
+        return contract.functions.findById(doc_id)
 
     return get_by_doc_id()

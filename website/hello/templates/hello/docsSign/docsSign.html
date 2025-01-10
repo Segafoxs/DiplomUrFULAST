@@ -66,14 +66,6 @@
                 Подписать
             </button>
         </td>
-        <!--                        <td>-->
-        <!--                            &lt;!&ndash; Кнопка для изменения статуса &ndash;&gt;-->
-        <!--                            <form method="post" action="{% url 'update_permit_status' %}" class="d-inline">-->
-        <!--                                {% csrf_token %}-->
-        <!--                                <input type="hidden" name="permit_number" value="{{ permit.number }}">-->
-        <!--                                <button type="submit" class="btn btn-primary btn-sm">Подписать</button>-->
-        <!--                            </form>-->
-        <!--                        </td>-->
     </tr>
     {% endfor %}
     </tbody>
@@ -91,11 +83,11 @@
         <th scope="col">Работа</th>
         <th scope="col">Дата начала работы</th>
         <th scope="col">Дата окончания работы</th>
+        <th scope="col">Скачать файл</th>
         <th scope="col">Подпись</th>
     </tr>
     </thead>
     <tbody>
-    <h2>Наряды на закрытие</h2>
     {% for permit in permit_list_close %}
     <tr>
         <td>{{ permit.number }}</td>
@@ -104,13 +96,41 @@
         <td>{{ permit.work_description }}</td>
         <td>{{ permit.start_of_work|date:"d.m.Y H:i" }}</td>
         <td>{{ permit.end_of_work|date:"d.m.Y H:i" }}</td>
+        <td><a href="{{ permit.download_link }}">Скачать</a></td>
         <td>
-            <!-- Кнопка для изменения статуса -->
-            <form method="post" action="{% url 'update_permit_status' %}" class="d-inline">
-                {% csrf_token %}
-                <input type="hidden" name="permit_number" value="{{ permit.number }}">
-                <button type="submit" class="btn btn-primary btn-sm">Подписать</button>
-            </form>
+            <!-- Modal -->
+            <div class="modal fade" id="signPermit{{ permit.number }}" tabindex="-1" aria-labelledby="signPermitModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post" action="{% url 'update_permit_status' %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <div class="mb-3">
+
+                                    <label for="private_key" class="form-label">Введите приватный ключ</label>
+                                    <input type="text" class="form-control" id="private_key" name="private_key"
+                                           required>
+                                    <input type="hidden" name="permit_number" value="{{ permit.number }}">
+
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Подписать</button>-->
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signPermit{{ permit.number }}">
+                Подписать
+            </button>
         </td>
     </tr>
     {% endfor %}

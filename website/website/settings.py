@@ -81,7 +81,7 @@ MINIO_BUCKET_NAME = "docs"
 
 # ANVIL
 ANVIL_URL = "http://127.0.0.1:8545"
-ANVIL_CONTRACT_ADDRESS = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6"
+ANVIL_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

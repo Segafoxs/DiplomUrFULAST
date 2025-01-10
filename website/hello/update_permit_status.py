@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Permit, HistoryPermit, PrivateKeys
+from .models import Permit, HistoryPermit, PrivateKeys, Employee
 
 from .notary import blockchain, signature
 from .s3 import minio
@@ -18,9 +18,13 @@ def update_permit_status(request):
         private_key = request.POST.get("private_key")
         permit_id = request.POST.get("permit_number")
 
-        permit = get_object_or_404(Permit, number=permit_id)
-        # Обработать ошибку если не нашли приватный ключ
-        private_key_obj = get_object_or_404(PrivateKeys, private_key=private_key)
+        try:
+            user = get_object_or_404(Employee, name=request.user)
+            permit = get_object_or_404(Permit, number=permit_id)
+            # Обработать ошибку если не нашли приватный ключ
+            private_key_obj = get_object_or_404(PrivateKeys, private_key=private_key, employer=user.id)
+        except Exception:
+            return HttpResponse("{message: Неверный ключ}")
 
         current_user = request.user
         if current_user.role == "MASTER":

@@ -10,8 +10,6 @@ from django.shortcuts import redirect, get_object_or_404
 from django_filters.views import FilterView
 from django_tables2 import SingleTableView, SingleTableMixin
 from django.forms import formset_factory
-from django.contrib.auth.hashers import make_password
-from .myModels import Work_is_mymodel, Manager_is_mymodel, Executor_is_mymodel, Director_is_mymodel, Permit_is_mymodel, ShiftManager_is_mymodel
 from .dbFunc import select_in_db
 from datetime import datetime
 from django.utils.timezone import make_aware
@@ -23,6 +21,7 @@ from .filters import MyFilter
 from django.http import JsonResponse
 from .myFunc import return_members, rolesCreatePermit, roles
 from minio import Minio
+from .notary.blockchain import read_all_chain_by_doc_id, read_all_documents
 
 
 
@@ -37,10 +36,32 @@ class ListViews(SingleTableMixin, FilterView):
 
 def view_permit(request):
     if request.method == "POST":
+        list_sign = []
         number = request.POST.get("number")
 
+
+        result = read_all_documents()
+
+        for i in range(len(result)):
+            if result[i][0] == int(number):
+                list_sign.append(result[i])
+            else:
+                continue
+
+        #     if len(list_sign) == 0:
+        #         return HttpResponse("{message: Документ не найден}")
+        #
+        #     return HttpResponse(f"{list_sign}")
+        #
+
         permit = Permit.objects.filter(number=number)
-        return render(request, 'hello/currentWorkPermits/viewCurrentPermit.html', context={"permit": permit})
+
+        context = {"permit": permit,
+                   "list_sign": list_sign}
+
+
+
+        return render(request, 'hello/currentWorkPermits/viewCurrentPermit.html', context)
 
 
 def create_employee(request):
@@ -128,11 +149,10 @@ def lists(request):
     filterset_class = MyFilter(request.GET, model)
     table = PermitTable(filterset_class.qs)
 
-    permit = Permit.objects.filter(number=1345)
 
 
     return render(request=request, template_name='hello/currentWorkPermits/currentWork.html',
-                  context={"model":model, "table":table, "filterset_class":filterset_class, "permit": permit})
+                  context={"model":model, "table":table, "filterset_class":filterset_class, })
 
 @login_required
 def docx_sign(request):
