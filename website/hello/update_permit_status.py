@@ -47,6 +47,7 @@ def update_permit_status(request):
             return HttpResponse("Ошибка работы с хранилищем", status=405)
 
         digest, sig, public_key = signature.generate_signature(response.data, private_key_obj.private_key)
+        print(signature.check_signature(private_key_obj.private_key, digest, sig))
         blockchain.write_to_blockchain(permit.number, digest, sig, public_key, current_user.name)
 
         if permit.action == "ОТКРЫТИЕ":

@@ -29,6 +29,7 @@ def check_signature(private_key, digest, signature) -> bool:
                                             gostcrypto.gostsignature.CURVES_R_1323565_1_024_2019[
                                                 'id-tc26-gost-3410-2012-256-paramSetB'])
 
-    public_key = sign_obj.public_key_generate(private_key)
+    primary_key_b = bytearray(private_key, encoding="utf-8")
+    public_key = sign_obj.public_key_generate(primary_key_b)
 
     return sign_obj.verify(public_key, digest, signature)

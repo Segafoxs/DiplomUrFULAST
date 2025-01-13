@@ -7,18 +7,64 @@
 {% endblock %}
 {% block content %}
     {% for n in permit %}
-    <h4>Номер наряда: {{ n.number }}</h4>
-    <h4>Статус: {{ n.status }}</h4>
-    <h4>Руководитель работ: {{ n.master_of_work }}</h4>
-    <h4>Работа: {{ n.work_description }}</h4>
-    <h4>Начало работы: {{ n.start_of_work }} Окончание работы {{ n.end_of_work }}</h4>
-    <h4>Условия: {{ n.safety }}</h4>
+    <div>
+        <dl class="row">
+      <dt class="col-sm-3">Номер наряда:</dt>
+      <dd class="col-sm-9">{{ n.number }}</dd>
 
+      <dt class="col-sm-3">Статус:</dt>
+      <dd class="col-sm-9">
+        {{ n.status }}
+      </dd>
 
+      <dt class="col-sm-3">Руководитель работ:</dt>
+      <dd class="col-sm-9">{{ n.master_of_work }}</dd>
+
+      <dt class="col-sm-3">Наряд выдал:</dt>
+      <dd class="col-sm-9">
+        {{ n.director }}
+      </dd>
+
+      <dt class="col-sm-3">Дежурный инженер станции:</dt>
+      <dd class="col-sm-9">
+        {{ n.station_engineer }}
+      </dd>
+
+      <dt class="col-sm-3">Начальник смены:</dt>
+      <dd class="col-sm-9">
+        {{ n.daily_manager }}
+      </dd>
+
+      <dt class="col-sm-3 text-truncate">Поручается выполнить:</dt>
+      <dd class="col-sm-9">{{ n.work_description }}</dd>
+
+      <dt class="col-sm-3">Начало работы:</dt>
+      <dd class="col-sm-9">
+        {{ n.start_of_work }}
+      </dd>
+
+      <dt class="col-sm-3">Окончание работы:</dt>
+      <dd class="col-sm-9">
+        {{ n.end_of_work }}
+      </dd>
+</dl>
     {% endfor %}
+    </div>
+    <br>
+    <br>
+    <div><p>Подписи</p></div>
+    <div>
+        {% if list_sign %}
+        <ol class="list-group list-group-numbered">
+        {% for user in list_sign%}
+            <li class="list-group-item"><strong>Пользователь:</strong>  {{ user }}<br></li>
+        {% endfor %}
+         </ol>
+        {% else %}
+        <p>Этот наряд никто не подписывал</p>
+    </div>
+        {% endif %}
 
-
-    <h5>{{ list_sign }}</h5>
 
 {% endblock %}
 

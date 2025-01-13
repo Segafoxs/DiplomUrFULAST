@@ -35,24 +35,41 @@ class ListViews(SingleTableMixin, FilterView):
 
 
 def view_permit(request):
+
     if request.method == "POST":
+        backet = []
         list_sign = []
         number = request.POST.get("number")
 
+        try:
+            result = read_all_documents()
+            for i in range(len(result)):
+                if result[i][0] == int(number):
+                    backet.append(result[i])
+                else:
+                    continue
 
-        result = read_all_documents()
+                if len(backet) == 0:
+                    return HttpResponse("{message: Документ не найден}")
 
-        for i in range(len(result)):
-            if result[i][0] == int(number):
-                list_sign.append(result[i])
-            else:
-                continue
 
-        #     if len(list_sign) == 0:
-        #         return HttpResponse("{message: Документ не найден}")
-        #
-        #     return HttpResponse(f"{list_sign}")
-        #
+
+            for i in range(len(backet)):
+
+                for j in range(len(backet[0])):
+                    if j == 5:
+                        list_sign.append(backet[i][j])
+
+
+
+
+
+
+        except Exception as err:
+            return HttpResponse(f"Транзакции по наряду {number} не найдены")
+
+
+
 
         permit = Permit.objects.filter(number=number)
 

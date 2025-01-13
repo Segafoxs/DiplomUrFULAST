@@ -7,8 +7,11 @@
 
 {% block content %}
 
-<h3>Оформление наряда-допуска</h3>
+<div>
+    <h3>Оформление наряда-допуска</h3>
+</div>
 
+<br>
 <form id="postDirectorForm">
     {% csrf_token %}
     <div class="row">
@@ -128,57 +131,48 @@
         <div class="col-md-7 pe-5">
             <fieldset>
               <legend>Для обеспечения безопасных условий необходимо</legend>
-              <div>
-                <input type="checkbox" id="instagram" name="source" value="Оградить рабочее место сигнальной лентой">
-                <label for="instagram">Оградить рабочее место сигнальной лентой</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="instagram" name="source" value="Оградить рабочее место сигнальной лентой">
+                <font size="4"><label class="form-check-label" for="instagram">Оградить рабочее место сигнальной лентой</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="facebook" name="source" value="Работать при достаточном освещении">
-                <label for="facebook">Работать при достаточном освещении</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="facebook" name="source" value="Работать при достаточном освещении">
+                <font size="4"><label class="form-check-label" for="facebook">Работать при достаточном освещении</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="search-engine" name="source" value="Соблюдать осторожность вблизи с работающим оборудованием">
-                <label for="search-engine">Соблюдать осторожность вблизи с работающим оборудованием</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="search-engine" name="source" value="Соблюдать осторожность вблизи с работающим оборудованием">
+                <font size="4"><label class="form-check-label" for="search-engine">Соблюдать осторожность вблизи с работающим оборудованием</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="word-of-mouth" name="source" value="Соблюдать требования ОТ и ПБ при работе с эл. инструментом">
-                <label for="word-of-mouth">Соблюдать требования ОТ и ПБ при работе с эл. инструментом</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="word-of-mouth" name="source" value="Соблюдать требования ОТ и ПБ при работе с эл. инструментом">
+                <font size="4"><label class="form-check-label" for="word-of-mouth">Соблюдать требования ОТ и ПБ при работе с эл. инструментом</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="press" name="source" value="Соблюдать требования при работе с ПС.">
-                <label for="press">Соблюдать требования при работе с ПС.</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="event" name="source" value="Работать в исправной спецодежде.">
+                <font size="4"><label class="form-check-label" for="event">Работать в исправной спецодежде.</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="event" name="source" value="Работать в исправной спецодежде.">
-                <label for="event">Работать в исправной спецодежде.</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="billboard1" name="source" value="По окончании работ убрать рабочее место.">
+                <font size="4"><label class="form-check-label" for="billboard1">По окончании работ убрать рабочее место.</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="billboard1" name="source" value="По окончании работ убрать рабочее место.">
-                <label for="billboard1">По окончании работ убрать рабочее место.</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="billboard2" name="source" value="Применять СИЗ.">
+                <font size="4"><label class="form-check-label" for="billboard2">Применять СИЗ.</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="billboard2" name="source" value="Применять СИЗ.">
-                <label for="billboard2">Применять СИЗ.</label>
+              <div class="form-check"><font size="4"><strong>Работа с краном</strong></font></div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="press" name="source" value="Соблюдать требования при работе с ПС.">
+                <font size="4"><label class="form-check-label" for="press">Соблюдать требования при работе с ПС.</label></font>
               </div>
-              <div>
-                <input type="checkbox" id="billboard3" name="source" value="Огневые работы производить по отдельному наряду-допуску.">
-                <label for="billboard3">Огневые работы производить по отдельному наряду-допуску.</label>
+                <div class="form-check">
+                    <font size="4"><strong>Огневые работы</strong></font>
+                </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="billboard3" name="source" value="Огневые работы производить по отдельному наряду-допуску.">
+                <font size="4"><label class="form-check-label" for="billboard3">Огневые работы производить по отдельному наряду-допуску.</label></font>
               </div>
             </fieldset>
-<!--            <select multiple class="form-select" id="safetyRequirements" name="safetyRequirements">-->
-<!--                <option value="Оградить рабочее место сигнальной лентой.">Оградить рабочее место сигнальной лентой.</option>-->
-<!--                <option value="Работать при достаточном освещении.">Работать при достаточном освещении.</option>-->
-<!--                <option value="Соблюдать осторожность вблизи с работающим оборудованием.">Соблюдать осторожность вблизи с работающим оборудованием.</option>-->
-<!--                <option value="Соблюдать требования ОТ и ПБ при работе с эл. инструментом.">Соблюдать требования ОТ и ПБ при работе с эл. инструментом.</option>-->
-<!--                <option value="Соблюдать требования при работе с ПС.">Соблюдать требования при работе с ПС.</option>-->
-<!--                <option value="Не загромождать проходы, проезды, площадки.">Не загромождать проходы, проезды, площадки.</option>-->
-<!--                <option value="Работать в исправной спецодежде.">Работать в исправной спецодежде.</option>-->
-<!--                <option value="Работать исправным инструментом.">Работать исправным инструментом.</option>-->
-<!--                <option value="По окончании работ убрать рабочее место.">По окончании работ убрать рабочее место.</option>-->
-<!--                <option value="Применять СИЗ.">Применять СИЗ.</option>-->
-<!--                <option value="Работать исправным эл. инструментом.">Работать исправным эл. инструментом.</option>-->
-<!--                <option value="Огневые работы производить по отдельному наряду-допуску.">Огневые работы производить по отдельному наряду-допуску.</option>-->
-<!--            </select>-->
+
         </div>
     </div>
 
@@ -221,7 +215,7 @@
 
     <div class="row">
         <div class="col-md-4">
-            <button type="button" class="btn btn-primary" onclick="submitPost('workPermitForm', '/workPermit/resultWorkPermit/')">Сформировать наряд-допуск</button>
+            <button type="button" class="btn btn-primary" onclick="submitPost('workPermitForm', '/workPermit/resultWorkPermit/')">Создать</button>
         </div>
     </div>
 </form>

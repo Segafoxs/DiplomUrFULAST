@@ -15,7 +15,7 @@ if __name__ == '__main__':
     #private_key = bytearray("test", encoding="utf-8")
     private_key = bytearray(password, encoding="utf-8")
     print(len(str(private_key)))
-    print(private_key)
+    print(private_key.decode())
 
     sign_obj = gostcrypto.gostsignature.new(gostcrypto.gostsignature.MODE_256,
                                             gostcrypto.gostsignature.CURVES_R_1323565_1_024_2019[
