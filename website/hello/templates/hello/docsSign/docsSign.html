@@ -1,7 +1,7 @@
 {% extends 'hello/example.html' %}
 
 {% block title %}
-Текущие наряды-допуски
+Наряды-допуски на согласовании
 {% endblock %}
 
 {% block content %}
@@ -38,7 +38,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Запрос приватного ключа</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form method="post" action="{% url 'update_permit_status' %}">
@@ -103,7 +103,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Запрос приватного ключа</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form method="post" action="{% url 'update_permit_status' %}">

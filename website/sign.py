@@ -1,4 +1,6 @@
 import gostcrypto
+import secrets
+import string
 
 if __name__ == '__main__':
     private_key = bytearray([
@@ -6,8 +8,7 @@ if __name__ == '__main__':
         0x1b, 0x60, 0x96, 0x1f, 0x49, 0x39, 0x7e, 0xee, 0x1d, 0x19, 0xce, 0x98, 0x91, 0xec, 0x3b, 0x28,
     ])
 
-    import secrets
-    import string
+
 
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(32))
@@ -42,8 +43,10 @@ if __name__ == '__main__':
                                             gostcrypto.gostsignature.CURVES_R_1323565_1_024_2019[
                                                 'id-tc26-gost-3410-2012-256-paramSetB'])
 
+    #генерация публичного ключа
     public_key = sign_obj.public_key_generate(private_key)
 
+    #верификация подписи
     if sign_obj.verify(public_key, digest, signature):
         print('Signature is correct')
     else:

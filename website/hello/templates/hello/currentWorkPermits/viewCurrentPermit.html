@@ -1,64 +1,74 @@
 {% extends 'hello/example.html' %}
 
 {% block title %}
-    Cоздание наряда-допуск
+    Информация наряда-допуска
 
 
 {% endblock %}
 {% block content %}
-    {% for n in permit %}
     <div>
         <dl class="row">
       <dt class="col-sm-3">Номер наряда:</dt>
-      <dd class="col-sm-9">{{ n.number }}</dd>
+      <dd class="col-sm-9">{{ permit.number }}</dd>
 
       <dt class="col-sm-3">Статус:</dt>
       <dd class="col-sm-9">
-        {{ n.status }}
+        {{ permit.status }}
       </dd>
 
       <dt class="col-sm-3">Руководитель работ:</dt>
-      <dd class="col-sm-9">{{ n.master_of_work }}</dd>
+      <dd class="col-sm-9">{{ permit.master_of_work }}</dd>
 
       <dt class="col-sm-3">Наряд выдал:</dt>
       <dd class="col-sm-9">
-        {{ n.director }}
+        {{ permit.director }}
       </dd>
 
       <dt class="col-sm-3">Дежурный инженер станции:</dt>
       <dd class="col-sm-9">
-        {{ n.station_engineer }}
+        {{ permit.station_engineer }}
       </dd>
 
       <dt class="col-sm-3">Начальник смены:</dt>
       <dd class="col-sm-9">
-        {{ n.daily_manager }}
+        {{ permit.daily_manager }}
       </dd>
 
       <dt class="col-sm-3 text-truncate">Поручается выполнить:</dt>
-      <dd class="col-sm-9">{{ n.work_description }}</dd>
+      <dd class="col-sm-9">{{ permit.work_description }}</dd>
 
       <dt class="col-sm-3">Начало работы:</dt>
       <dd class="col-sm-9">
-        {{ n.start_of_work }}
+        {{ permit.start_of_work }}
       </dd>
 
       <dt class="col-sm-3">Окончание работы:</dt>
       <dd class="col-sm-9">
-        {{ n.end_of_work }}
+        {{ permit.end_of_work }}
       </dd>
 </dl>
-    {% endfor %}
     </div>
     <br>
     <br>
     <div><p>Подписи</p></div>
     <div>
-        {% if list_sign %}
+        {% if master %}
         <ol class="list-group list-group-numbered">
-        {% for user in list_sign%}
-            <li class="list-group-item"><strong>Пользователь:</strong>  {{ user }}<br></li>
-        {% endfor %}
+
+            <li class="list-group-item"><strong>Пользователь:</strong>  {{ master.name }} <strong>Дата подписи:</strong> {{ master.date_sign }}
+                <strong>Блок транзакции № {{ master.sign }}</strong><br> </li>
+
+            <li class="list-group-item"><strong>Пользователь:</strong>  {{ director.name }} <strong>Дата подписи:</strong> {{ director.date_sign }}
+                <strong>Блок транзакции № {{ director.sign }}</strong><br> </li>
+
+            <li class="list-group-item"><strong>Пользователь:</strong>  {{ stateEng.name }} <strong>Дата подписи:</strong> {{ stateEng.date_sign }}
+                <strong>Блок транзакции № {{ stateEng.sign }}</strong><br> </li>
+
+            <li class="list-group-item"><strong>Пользователь:</strong>  {{ dailyMan.name }} <strong>Дата подписи:</strong> {{ dailyMan.date_sign }}
+                <strong>Блок транзакции № {{ dailyMan.sign }}</strong><br> </li>
+
+            <li class="list-group-item"><strong>Пользователь:</strong>  {{ executor.name }} <strong>Дата подписи:</strong> {{ executor.date_sign }}
+                <strong>Блок транзакции № {{ executor.sign }}</strong><br> </li>
          </ol>
         {% else %}
         <p>Этот наряд никто не подписывал</p>

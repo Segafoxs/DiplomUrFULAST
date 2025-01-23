@@ -12,7 +12,7 @@
         <br>
         <form action="" method="GET">
             {{ filterset_class.form }}
-            <button type="submit">Filter</button>
+            <button class="btn btn-primary" type="submit">Поиск</button>
         </form>
         <br>
         {% render_table table %}
@@ -40,7 +40,7 @@
                             <label for="number" class="form-label">Введите номер наряда</label>
                             <input type="text" class="form-control" id="number" name="number" required>
                         </div>
-                        <button type="submit">Filter</button>
+                        <button class="btn btn-primary" type="submit">Filter</button>
                     </div>
                 </div>
             </form>

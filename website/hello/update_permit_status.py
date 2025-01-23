@@ -14,6 +14,7 @@ from .s3 import minio
 @login_required
 @csrf_exempt
 def update_permit_status(request):
+
     if request.method == "POST":
         private_key = request.POST.get("private_key")
         permit_id = request.POST.get("permit_number")
@@ -27,18 +28,6 @@ def update_permit_status(request):
             return HttpResponse("{message: Неверный ключ}")
 
         current_user = request.user
-        if current_user.role == "MASTER":
-            permit.signature_master = signature
-        elif current_user.role == "DIRECTOR":
-            permit.signature_director = signature
-        elif current_user.role == "DAILYMANAGER":
-            permit.signature_dailymanager = signature
-        elif current_user.role == "STATIONENGINEER":
-            permit.signature_stationengineer = signature
-        elif current_user.role == "EXECUTOR":
-            permit.signature_executor = signature
-        else:
-            return HttpResponse("У вас нет прав для подписи.", status=403)
 
         try:
             response = minio.get_object(permit.generate_file_name())
@@ -48,7 +37,21 @@ def update_permit_status(request):
 
         digest, sig, public_key = signature.generate_signature(response.data, private_key_obj.private_key)
         print(signature.check_signature(private_key_obj.private_key, digest, sig))
-        blockchain.write_to_blockchain(permit.number, digest, sig, public_key, current_user.name)
+        number_tx = blockchain.write_to_blockchain(permit.number, digest, sig, public_key, current_user.name)
+
+        if current_user.role == "MASTER":
+            permit.signature_master = number_tx["block_number"]
+        elif current_user.role == "DIRECTOR":
+            permit.signature_director = number_tx["block_number"]
+        elif current_user.role == "DAILYMANAGER":
+            permit.signature_dailymanager = number_tx["block_number"]
+        elif current_user.role == "STATIONENGINEER":
+            permit.signature_stationengineer = number_tx["block_number"]
+        elif current_user.role == "EXECUTOR":
+            permit.signature_executor = number_tx["block_number"]
+        else:
+            return HttpResponse("У вас нет прав для подписи.", status=403)
+
 
         if permit.action == "ОТКРЫТИЕ":
             if permit.status == "На согласовании с руководителем работ":

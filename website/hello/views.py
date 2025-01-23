@@ -19,10 +19,10 @@ from .forms import LinePermit, LoginForm, ChoiceManager, DepartmentForm, WorkerG
 from .tables import PermitTable
 from .filters import MyFilter
 from django.http import JsonResponse
-from .myFunc import return_members, rolesCreatePermit, roles
+from .myFunc import return_members, rolesCreatePermit, roles, return_date
 from minio import Minio
-from .notary.blockchain import read_all_chain_by_doc_id, read_all_documents
-
+from .notary.blockchain import read_all_chain_by_doc_id, read_all_documents, get_block_pop, get_block_number
+from .myModels import Master, Director, DailyManager, Executor, StateEngineer
 
 
 user_from_permit = {}
@@ -37,9 +37,25 @@ class ListViews(SingleTableMixin, FilterView):
 def view_permit(request):
 
     if request.method == "POST":
+        
         backet = []
         list_sign = []
         number = request.POST.get("number")
+
+        permit = get_object_or_404(Permit, number=number)
+
+        context = {"permit": permit,
+                   "master": None,
+                   "director": None,
+                   "stateEng": None,
+                   "dailyMan": None,
+                   "executor": None
+                   }
+            #Нужно достать подписи всех участников,
+            # закинуть в функцию  get_block_number,
+            # достать дату и вывести всё на экран
+
+
 
         try:
             result = read_all_documents()
@@ -63,20 +79,61 @@ def view_permit(request):
 
 
 
+            if len(list_sign) > 0:
+                master = Master()
+                master.name = list_sign[0]
+                master.sign = permit.signature_master
+                master.block_tx = get_block_number(int(master.sign))
+                master.date_sign = return_date(master.block_tx["timestamp"])
+                context["master"] = master
+
+
+            if len(list_sign) > 1:
+                director = Director()
+                director.name = list_sign[1]
+                director.sign = permit.signature_director
+                director.block_tx = get_block_number(int(director.sign))
+                director.date_sign = return_date(director.block_tx["timestamp"])
+                context["director"] = director
+
+            if len(list_sign) > 2:
+                stateEng = StateEngineer()
+                stateEng.name = list_sign[2]
+                stateEng.sign = permit.signature_stationengineer
+                stateEng.block_tx = get_block_number(int(stateEng.sign))
+                stateEng.date_sign = return_date(stateEng.block_tx["timestamp"])
+                context["stateEng"] = stateEng
+
+            if len(list_sign) > 3:
+                dailyMan = DailyManager()
+                dailyMan.name = list_sign[3]
+                dailyMan.sign = permit.signature_dailymanager
+                dailyMan.block_tx = get_block_number(int(dailyMan.sign))
+                dailyMan.date_sign = return_date(dailyMan.block_tx["timestamp"])
+                context["dailyMan"] = dailyMan
+
+            if len(list_sign) > 4:
+                executor = Executor()
+                executor.name = list_sign[4]
+                executor.sign = permit.signature_executor
+                executor.block_tx = get_block_number(int(executor.sign))
+                executor.date_sign = return_date(executor.block_tx["timestamp"])
+                context["executor"] = executor
+
+
+            # sign_director = permit.signature_director
+            # sign_stateEng = permit.signature_stationengineer
+            # sign_dailyMan = permit.signature_dailymanager
+            # sign_executor = permit.signature_executor
+            #
+            # block = get_block_number(int(sign_master))
+            # timestmp = block["timestamp"]
+            # date = return_date(timestmp)
+
 
 
         except Exception as err:
             return HttpResponse(f"Транзакции по наряду {number} не найдены")
-
-
-
-
-        permit = Permit.objects.filter(number=number)
-
-        context = {"permit": permit,
-                   "list_sign": list_sign}
-
-
 
         return render(request, 'hello/currentWorkPermits/viewCurrentPermit.html', context)
 
