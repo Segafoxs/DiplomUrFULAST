@@ -1,7 +1,65 @@
 from django import forms
-from .models import Department, Permit
+from . import models
+from django_select2.forms import Select2Widget
 
 
+
+
+# class DirectorSearchsss(forms.Form):
+#     name = forms.ModelChoiceField(label="Выдающий наряд-допуск", queryset=models.Employee.objects.all(),
+#                                   widget=Select2Widget(attrs={"required id": "director",
+#                                                               "name": "director"}))
+
+class DirectorSearch(forms.ModelForm):
+
+    directorPermit = forms.ModelChoiceField(label="Выдающий наряд-допуск", queryset=models.Employee.objects.filter(role="DIRECTOR"),
+                                  widget=Select2Widget(attrs={"required id": "director",
+                                                              }))
+    class Meta:
+        model = models.Employee
+        fields = ('directorPermit',)
+
+
+
+class ManagerSearch(forms.ModelForm):
+
+    managerPermit = forms.ModelChoiceField(label="Руководитель работ", queryset=models.Employee.objects.filter(role="MASTER"),
+                                  widget=Select2Widget(attrs={"required id": "manager"}))
+
+    class Meta:
+        model = models.Employee
+        fields = ('managerPermit',)
+
+
+class ExecutorSearch(forms.ModelForm):
+    executorPermit = forms.ModelChoiceField(label="Исполнитель работ", queryset=models.Employee.objects.all(),
+                                  widget=Select2Widget(attrs={"required id": "executor",
+                                                              }))
+
+    class Meta:
+        model = models.Employee
+        fields = ('executorPermit',)
+
+
+class StateEngineerSearch(forms.ModelForm):
+    stateEngineerPermit = forms.ModelChoiceField(label="Дежурный инженер станции", queryset=models.Employee.objects.filter(role="STATIONENGINEER"),
+                                  widget=Select2Widget(attrs={"required id": "stateEngineer",
+                                                              }))
+
+    class Meta:
+        model = models.Employee
+        fields = ('stateEngineerPermit',)
+
+
+class DailyManagerSearch(forms.ModelForm):
+    dailyManagerPermit = forms.ModelChoiceField(label="Допускающий (Начальник смены)", queryset=models.Employee.objects.filter(role="DAILYMANAGER"),
+                                  widget=Select2Widget(attrs={"required id": "dailyManager",
+                                                              "class": "form-select form-select-lg",
+                                                              }))
+
+    class Meta:
+        model = models.Employee
+        fields = ('dailyManagerPermit',)
 
 
 class LoginForm(forms.Form):
@@ -11,7 +69,7 @@ class LoginForm(forms.Form):
 
 
 class DepartmentForm(forms.Form):
-    department = forms.ModelChoiceField(label="Подразделение", queryset=Department.objects.all(), widget=forms.Select(attrs={"class": "form-select form-select-lg mb-3",
+    department = forms.ModelChoiceField(label="Подразделение", queryset=models.Department.objects.all(), widget=forms.Select(attrs={"class": "form-select form-select-lg mb-2",
                                                                                                                           "name": "department"}))
 
 

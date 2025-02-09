@@ -34,6 +34,7 @@
         {{ permit.daily_manager }}
       </dd>
 
+
       <dt class="col-sm-3 text-truncate">Поручается выполнить:</dt>
       <dd class="col-sm-9">{{ permit.work_description }}</dd>
 
@@ -46,6 +47,15 @@
       <dd class="col-sm-9">
         {{ permit.end_of_work }}
       </dd>
+
+      <dt class="col-sm-3">Производитель работ:</dt>
+      <dd class="col-sm-9">{{ permit.executor }}</dd>
+
+      <dt class="col-sm-3">Члены бригады:</dt>
+      <dd class="col-sm-9">
+        {{ permit.workers }}
+      </dd>
+
 </dl>
     </div>
     <br>

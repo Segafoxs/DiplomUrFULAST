@@ -12,98 +12,41 @@
 </div>
 
 <br>
-<form id="postDirectorForm">
+<form method="post" id="workPermitForm">
     {% csrf_token %}
     <div class="row">
         <div class="col-md-4 mb-4 pb-2">
-            <input type="text" name="search_director" id="searchDirectorInput" class="form-control form-control-lg" placeholder="ФИО">
-            <label class="form-label" for="searchDirectorInput">Наряд-допуск выдал</label>
-        </div>
-        <div class="col-md-4 mb-4 pb-2">
-            <button type="button" class="btn btn-light" onclick="submitPost('postDirectorForm', 'postDirector/')">Отправить</button>
+            {{ form_directorSearch }}
         </div>
     </div>
-</form>
 
-<form id="postManagerForm">
-    {% csrf_token %}
     <div class="row">
         <div class="col-md-4 mb-4 pb-2">
-            <input type="text" name="search_manager" id="searchManagerInput" class="form-control form-control-lg" placeholder="ФИО руководителя">
-            <label class="form-label" for="searchManagerInput">Руководитель работ</label>
-        </div>
-        <div class="col-md-4 mb-4 pb-2">
-            <button type="button" class="btn btn-light" onclick="submitPost('postManagerForm', '/workPermit/postManager/')">Отправить</button>
+                {{ form_managerSearch }}
         </div>
     </div>
-</form>
 
-<form id="postExecutorForm">
-    {% csrf_token %}
+    <div class="row">
+         <div class="col-md-4 mb-4 pb-2">
+                {{ form_executorSearch }}
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4 mb-4 pb-2">
-            <input type="text" name="search_executor" id="searchExecutorInput" class="form-control form-control-lg" placeholder="ФИО исполнителя">
-            <label class="form-label" for="searchExecutorInput">Исполнитель работ</label>
-        </div>
-        <div class="col-md-4 mb-4 pb-2">
-            <button type="button" class="btn btn-light" onclick="submitPost('postExecutorForm', '/workPermit/postExecutor/')">Отправить</button>
+                {{ form_stateEngineerSearch }}
         </div>
     </div>
-</form>
 
-<form id="postShiftManagerForm">
-    {% csrf_token %}
+
+
+
     <div class="row">
         <div class="col-md-4 mb-4 pb-2">
-            <input type="text" name="search_shiftManager" id="searchShiftManagerInput" class="form-control form-control-lg" placeholder="ФИО начальника смены">
-            <label class="form-label" for="searchShiftManagerInput">Начальник смены</label>
-        </div>
-        <div class="col-md-4 mb-4 pb-2">
-            <button type="button" class="btn btn-light" onclick="submitPost('postShiftManagerForm', '/workPermit/postShiftManager/')">Отправить</button>
+            {{ form_dailyManagerSearch }}
         </div>
     </div>
-</form>
 
-<form id="postStateEngineerForm">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-md-4 mb-4 pb-2">
-            <input type="text" name="search_state_engineer" id="searchStateEngineerInput" class="form-control form-control-lg" placeholder="ФИО дежурного инженера">
-            <label class="form-label" for="searchStateEngineerInput">Дежурный инженер станции</label>
-        </div>
-        <div class="col-md-4 mb-4 pb-2">
-            <button type="button" class="btn btn-light" onclick="submitPost('postStateEngineerForm', '/workPermit/postStateEngineer/')">Отправить</button>
-        </div>
-    </div>
-</form>
-
-
-<!--        <div class="row">-->
-<!--                    <div class="col-md-2 mb-4 pb-2">-->
-
-<!--                      <div data-mdb-input-init class="form-outline">-->
-<!--                        <input type="text" id="countInp" size="1" maxlength="1"/>-->
-<!--                        <label class="form-label" for="form3Examplev2">Количество членов бригады</label>-->
-<!--                        <form id="myForm">-->
-
-
-<!--                        <input type="submit" id="btnSub"/>-->
-<!--                        </form>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                    <div class="col-md-8 mb-4 pb-2">-->
-
-<!--                      <div class="col-md-9 pe-1">-->
-<!--                          <textarea name="member" class="form-control" rows="3"></textarea>-->
-<!--                          Должность, ФИО, разряд членов бригады-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--            </div>-->
-
-
-  <form method="post" id="workPermitForm">
-    {% csrf_token %}
-    
     <div class="row align-items-center py-3">
         <div class="col-md-4 mb-4 pb-2">
             {{ form_department }}
@@ -113,7 +56,7 @@
     <div class="row align-items-center py-3">
         <div class="col-md-4 mb-4 pb-2">
             <label for="countMemberInput" class="form-label">Количество членов бригады</label>
-            <input type="number" name="countMember" id="countMemberInput" class="form-control form-control-lg" placeholder="Введите количество" min="1" oninput="generateMemberFields(this.value)" />
+            <input type="number" name="countMember" id="countMemberInput" class="form-control form-control-lg" placeholder="Введите количество членов бригады" min="1" oninput="generateMemberFields(this.value)" />
         </div>
     </div>
 
@@ -185,7 +128,9 @@
             <label for="timeStart" class="form-label">Время начала работы</label>
             <input type="time" name="timeStart" id="timeStart" class="form-control form-control-lg" />
         </div>
-        <div class="col-md-3 mb-4 pb-2">
+    </div>
+    <div class="row">
+    <div class="col-md-3 mb-4 pb-2">
             <label for="dateEnd" class="form-label">Дата окончания</label>
             <input type="date" name="dateEnd" id="dateEnd" class="form-control form-control-lg" />
         </div>
@@ -194,7 +139,6 @@
             <input type="time" name="timeEnd" id="timeEnd" class="form-control form-control-lg" />
         </div>
     </div>
-
     <div class="row">
         <div class="col-md-6 mb-4 pb-2">
             <label for="conditions" class="form-label">Особые условия</label>
@@ -238,7 +182,24 @@
   </div>
 </div>
   
+
 <script>
+     $(document).ready(function () {
+     $("#director").select2();
+});
+     $(document).ready(function () {
+     $("#manager").select2();
+});
+    $(document).ready(function () {
+     $("#executor").select2();
+});
+    $(document).ready(function () {
+         $("#stateEngineer").select2();
+});
+    $(document).ready(function () {
+         $("#dailyManager").select2();
+});
+
 async function submitPost(formId, url) {
     const form = document.getElementById(formId);
     const formData = new FormData(form);
@@ -293,7 +254,11 @@ function generateMemberFields(count) {
         container.appendChild(row);
     }
 }
+
 </script>
+
+
+
 
 
 

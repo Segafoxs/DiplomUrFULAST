@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'hello',
     "django_tables2",
     'django_filters',
+    'django_select2',
+    'ajax_select',
 ]
 
 MIDDLEWARE = [

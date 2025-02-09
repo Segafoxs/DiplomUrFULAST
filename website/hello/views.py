@@ -15,7 +15,8 @@ from datetime import datetime
 from django.utils.timezone import make_aware
 from .models import Employee, Permit, Department, HistoryPermit, PrivateKeys
 from django.contrib.auth.decorators import login_required
-from .forms import LinePermit, LoginForm, ChoiceManager, DepartmentForm, WorkerGroup
+from .forms import LinePermit, LoginForm, ChoiceManager, DepartmentForm, WorkerGroup, DirectorSearch, \
+    ManagerSearch, ExecutorSearch, StateEngineerSearch, DailyManagerSearch
 from .tables import PermitTable
 from .filters import MyFilter
 from django.http import JsonResponse
@@ -36,8 +37,6 @@ class ListViews(SingleTableMixin, FilterView):
 
 def view_permit(request):
 
-    if request.method == "POST":
-        
         backet = []
         list_sign = []
         number = request.POST.get("number")
@@ -191,12 +190,19 @@ def work_permit(request):
 
     form_department = DepartmentForm()
 
-    #TestForm = formset_factory(WorkerGroup, extra=4)
-    #testForm = TestForm()
+    form_directorSearch = DirectorSearch()
+    form_managerSearch = ManagerSearch()
+    form_executorSearch = ExecutorSearch()
+    form_stateEngineerSearch = StateEngineerSearch()
+    form_dailyManagerSearch = DailyManagerSearch()
 
     context = {
         "form_department": form_department,
-
+        "form_directorSearch": form_directorSearch,
+        "form_managerSearch": form_managerSearch,
+        "form_executorSearch": form_executorSearch,
+        "form_stateEngineerSearch": form_stateEngineerSearch,
+        "form_dailyManagerSearch": form_dailyManagerSearch,
     }
     return render(request, 'hello/workPermit/workPermit.html', context)
 
@@ -259,138 +265,10 @@ def docx_sign(request):
 
     return render(request, 'hello/docsSign/docsSign.html', context)
 
-def postDirector(request):
-    try:
-        if request.method == "POST":
-            search_query = request.POST.get('search_director')
-            user_from_db = select_in_db(search_query)
-            if user_from_db is not None:
-                for user in user_from_db:
-                    post = user.role
-                    if user.role != "DIRECTOR":
-                        return JsonResponse({"error": f"{roles[post]} не может выдавать наряд-допуск"}, status=400)
-                    director_id = user.id
-                    user_from_permit['director'] = director_id
-                    print(f'{user.id} {user.name} {user.role}')
-                return JsonResponse({"success": "Начальник цеха добавлен успешно", "users": list(user_from_db.values())})
-            else:
-                return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    except Exception as err:
-        return JsonResponse({"error": str(err)}, status=500)
-
-
-
-def postManager(request):
-    try:
-        if request.method == "POST":
-            search_query = request.POST.get('search_manager')
-            user_from_db = select_in_db(search_query)
-            if user_from_db is not None:
-                for user in user_from_db:
-                    if user.role not in rolesCreatePermit:
-                        return JsonResponse({f"error": f"Руководителем не может быть {roles[user.role]}"}, status=400)
-                    manager_id = user.id
-                    user_from_permit['manager'] = manager_id
-                    print(f'{user.id} {user.name} {user.role}')
-                return JsonResponse({"success": "Руководитель добавлен успешно", "users": list(user_from_db.values())})
-            else:
-                return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    except Exception as err:
-        return JsonResponse({"error": str(err)}, status=500)
-
-
-
-def postExecutor(request):
-    try:
-        if request.method == "POST":
-            search_query = request.POST.get('search_executor')
-            count_worker = request.POST.get('count_member')
-            user_from_db = select_in_db(search_query)
-            if user_from_db is not None:
-                for user in user_from_db:
-                    executor_id = user.id
-                    user_from_permit['executor'] = executor_id
-                    print(f'{user.id} {user.name} {user.role}')
-                return JsonResponse({"success": "Исполнитель добавлен успешно", "users": list(user_from_db.values())})
-            else:
-                return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    except Exception as err:
-        return JsonResponse({"error": str(err)}, status=500)
-
-
-
-def postShiftManager(request):
-    try:
-        if request.method == "POST":
-            search_query = request.POST.get('search_shiftManager')
-            users = select_in_db(search_query)
-            if users is not None:
-                for user in users:
-                    if user.role != "DAILYMANAGER":
-                        return JsonResponse({"error": f"{user.role} не может быть начальником смены"}, status=400)
-
-                    shiftManager_id = user.id
-                    user_from_permit['shiftManager'] = shiftManager_id
-                    print(f'{user.id} {user.name} {user.role}')
-
-                return JsonResponse({"success": "Начальник смены добавлен успешно", "users": list(users.values())})
-            else:
-                return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    except Exception as err:
-        return JsonResponse({"error": str(err)}, status=500)
-
-
-def postStateEngineer(request):
-    try:
-        if request.method == "POST":
-            search_query = request.POST.get('search_state_engineer')
-            users = select_in_db(search_query)
-            if users is not None:
-                for user in users:
-                    if user.role != "STATIONENGINEER":
-                        return JsonResponse({"error": f"{user.role} не может быть дежурным инженером станции"}, status=400)
-
-                    stateEngineer_id = user.id
-                    user_from_permit['stateEngineer'] = stateEngineer_id
-                    print(f'{user.id} {user.name} {user.role}')
-
-                return JsonResponse({"success": "Дежурный инженер станции добавлен успешно", "users": list(users.values())})
-            else:
-                return JsonResponse({"error": "USER IS NOT FOUND"}, status=404)
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    except Exception as err:
-        return JsonResponse({"error": str(err)}, status=500)
-
-
-def postWorker(request):
-
-    try:
-        if request.method == "POST":
-            search_query = request.POST.get('search_worker')
-            users = select_in_db(search_query)
-            if users is not None:
-                for user in users:
-                    worker_id = user.id
-
-                    user_from_permit['worker'] = worker_id
-
-                    # insert_into_doc(executor)
-                    print(f'{user.id} {user.name} {user.role}')
-            else:
-                return HttpResponse("USER IS NOT FOUND")
-
-            return render(request, "hello/workPermit/searchUser.html", {'query': search_query, 'user': users})
-        return render(request, "hello/workPermit/searchUser.html", {})
-    except Exception as err:
-        return HttpResponse(f"{err}")
 
 def resultPermit(request):
 
-    list_user = {}
+    list_user = []
 
     try:
 
@@ -400,12 +278,13 @@ def resultPermit(request):
             new_permit.department = Department.objects.get(id=request.POST.get("department"))
 
             #Участники наряда
-            new_permit.master_of_work = Employee.objects.get(id=user_from_permit['manager'])
-            new_permit.executor = Employee.objects.get(id=user_from_permit['executor'])
+
+            new_permit.director = Employee.objects.get(id=request.POST.get("directorPermit"))
+            new_permit.master_of_work = Employee.objects.get(id=request.POST.get("managerPermit"))
+            new_permit.executor = Employee.objects.get(id=request.POST.get("executorPermit"))
             new_permit.countWorker = request.POST.get("countMember")
-            new_permit.daily_manager = Employee.objects.get(id=user_from_permit['shiftManager'])
-            new_permit.station_engineer = Employee.objects.get(id=user_from_permit['stateEngineer'])
-            new_permit.director = Employee.objects.get(id=user_from_permit['director'])
+            new_permit.station_engineer = Employee.objects.get(id=request.POST.get("stateEngineerPermit"))
+            new_permit.daily_manager = Employee.objects.get(id=request.POST.get("dailyManagerPermit"))
 
             #Работа по наряду
             new_permit.work_description = request.POST.get("work")

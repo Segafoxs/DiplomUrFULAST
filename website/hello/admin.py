@@ -5,6 +5,10 @@ import django.db.models
 from django.contrib import admin
 from .models import Post, Employee, Permit, Department, TypeOfWork, HistoryPermit, PrivateKeys
 
+from ajax_select import make_ajax_field
+
+
+
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     pass
@@ -59,3 +63,5 @@ class PrivateKeysAdmin(admin.ModelAdmin):
         password = ''.join(secrets.choice(alphabet) for i in range(32))
         initial_data['private_key'] = password
         return initial_data
+
+
