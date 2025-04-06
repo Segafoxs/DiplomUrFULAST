@@ -1,3 +1,5 @@
+Электронный наряд-допуск
+
 Entity:
 
 - Manager (full name, username, password)(create permit, view permit)
