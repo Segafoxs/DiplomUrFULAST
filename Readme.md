@@ -1,27 +1,36 @@
-Электронный наряд-допуск
 
-Entity:
-
-- Manager (full name, username, password)(create permit, view permit)
-- Master (full name, username, password) (review and signature)
-- Worker (review and signature)
-- Director (review and signature, reject)
-- DailyManager (finish resolution for permit, reject)
-
-- PermitDocument(who? when? number, type(), status, path storage).
-- Departments (id name) 
-- TypesOfWork (id description)
-
-Service:
-- auth
-- create permit
-- view permit
-- change permit
-- signature permit
-- user management 
-- notify Manager about any change, submit and signature
-- generate docx file with signature. 
+# Электронный наряд-допуск
 
 
+## Установка
+
+- Склонируйте данный проект
+
+```bash
+  git clone https://github.com/Segafoxs/DiplomUrFULAST
+```
+- Установите зависимости
+```bash
+ pip install -r requirements.txt 
+``` 
+- Создайте файл с миграциями
+```bash
+ python manage.py makemigrations
+```
+- Выполните миграции
+```bash
+ python manage.py migrate
+```
+- Перейдите в директорию website
+```bash
+ cd .\website\
+```
+- Запустите сервер
+```bash
+ python manage.py runserver 
+```
 
 
+# Скриншоты
+- https://cloud.mail.ru/public/2Jdi/oEYDDhqVP
+- https://cloud.mail.ru/public/qBwU/4B4Vk6UHz
